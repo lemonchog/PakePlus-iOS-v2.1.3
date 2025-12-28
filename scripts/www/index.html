@@ -1,0 +1,4450 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0, user-scalable=yes">
+    <title>百家樂多路單智能分析系統</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 根據螢幕寬度自動調整根字體大小 */
+        html {
+            font-size: 16px; /* 預設基準 */
+        }
+
+        /* 極小螢幕 (≤360px) */
+        @media (max-width: 360px) {
+            html {
+                font-size: 12px;
+            }
+        }
+
+        /* 小螢幕 (361px-480px) */
+        @media (min-width: 361px) and (max-width: 480px) {
+            html {
+                font-size: 13px;
+            }
+        }
+
+        /* 中等螢幕 (481px-768px) */
+        @media (min-width: 481px) and (max-width: 768px) {
+            html {
+                font-size: 14px;
+            }
+        }
+
+        /* 大螢幕 (769px-1024px) */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            html {
+                font-size: 15px;
+            }
+        }
+
+        /* 超大螢幕 (>1024px) */
+        @media (min-width: 1025px) {
+            html {
+                font-size: 16px;
+            }
+        }
+
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            background: #e9ecef;
+            padding: 0.625rem; /* 使用 rem 單位自動縮放 */
+        }
+
+        /* ===== 激活界面樣式 ===== */
+        #activationScreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .activation-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px 30px;
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .activation-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .activation-header h1 {
+            color: #667eea;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+
+        .activation-header p {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .activation-info-box {
+            background: #e8f4ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .activation-group {
+            margin-bottom: 25px;
+        }
+
+        .activation-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .device-id-display {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 16px;
+            text-align: center;
+            color: #667eea;
+            font-weight: bold;
+            letter-spacing: 2px;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-device-id-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 6px 12px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .copy-device-id-btn:hover {
+            background: #5568d3;
+        }
+
+        .activation-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .activation-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .activation-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .activation-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .activation-btn:active {
+            transform: translateY(0);
+        }
+
+        .activation-footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            color: #888;
+            font-size: 12px;
+        }
+
+        .activation-error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #ef5350;
+            animation: shake 0.5s;
+        }
+
+        .activation-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            border: 1px solid #66bb6a;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.7);
+            }
+            50% { 
+                transform: scale(1.05);
+                box-shadow: 0 0 15px 5px rgba(255, 107, 107, 0.3);
+            }
+        }
+
+        #mainApp {
+            display: none;
+        }
+
+        .activated #mainApp {
+            display: block;
+        }
+
+        .activated #activationScreen {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .activation-container {
+                padding: 30px 20px;
+            }
+
+            .activation-header h1 {
+                font-size: 22px;
+            }
+
+            .device-id-display {
+                font-size: 14px;
+                padding: 12px;
+            }
+
+            .copy-device-id-btn {
+                position: static;
+                transform: none;
+                width: 100%;
+                margin-top: 10px;
+            }
+        }
+
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+
+        /* 頁首 */
+        .header {
+            background: white;
+            padding: 0.9375rem; /* 15px */
+            margin-bottom: 0.625rem; /* 10px */
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.1);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.625rem; /* 10px */
+            margin-bottom: 0.625rem; /* 10px */
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem; /* 8px */
+            padding: 0.5rem 0.9375rem; /* 8px 15px */
+            background: #667eea;
+            color: white;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; /* 14px */
+            font-weight: 600;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 0.5rem; /* 8px */
+        }
+
+        .header-btn {
+            padding: 0.5rem 0.9375rem; /* 8px 15px */
+            border: none;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.8125rem; /* 13px */
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3125rem; /* 5px */
+        }
+
+        .btn-home {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-logout {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .header-title {
+            text-align: center;
+        }
+
+        .header-title h1 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        /* 輸入區 */
+        .input-section {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* 桌面版: 按鈕排成一排 */
+        .input-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.625rem 1.25rem; /* 10px 20px */
+            border: none;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; /* 14px */
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            white-space: nowrap;
+            min-height: 2.75rem; /* 44px - 觸控友善 */
+        }
+
+        .btn-banker {
+            background: #dc3545;
+        }
+
+        .btn-player {
+            background: #0d6efd;
+        }
+
+        .btn-undo {
+            background: #ffc107;
+        }
+
+        .btn-analyze {
+            background: #28a745;
+        }
+
+        .btn-clear {
+            background: #6c757d;
+        }
+
+        .btn-random {
+            background: #6f42c1;
+        }
+
+        .btn-chart {
+            background: #17a2b8;
+        }
+
+        .random-group {
+            display: flex;
+            gap: 0.625rem; /* 10px */
+            align-items: center;
+        }
+
+        .random-inputs {
+            display: flex;
+            gap: 0.5rem; /* 8px */
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .random-input {
+            width: 3.75rem; /* 60px */
+            padding: 0.5rem; /* 8px */
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; /* 14px */
+            text-align: center;
+        }
+
+        .random-label {
+            font-size: 0.75rem; /* 12px */
+            color: #6c757d;
+            white-space: nowrap;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 3.75rem; /* 60px */
+            padding: 0.625rem; /* 10px */
+            border: 1px solid #ced4da;
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.875rem; /* 14px */
+            margin-bottom: 0.625rem; /* 10px */
+            font-family: monospace;
+        }
+
+        /* 手機和平板: 固定在底部 */
+        @media (max-width: 1024px) {
+            body {
+                padding-bottom: 160px; /* 為固定底部留出空間 */
+                overflow-x: hidden; /* 防止水平滾動 */
+            }
+
+            .input-section {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                margin: 0;
+                border-radius: 0;
+                z-index: 1000;
+                padding: 8px;
+                box-shadow: 0 -2px 10px rgba(0,0,0,0.2);
+                width: 100%;
+                box-sizing: border-box;
+                overflow-x: hidden; /* 防止內容溢出 */
+            }
+
+            .input-controls {
+                display: flex;
+                gap: 4px;
+                margin-bottom: 8px;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .btn {
+                padding: 8px 6px;
+                font-size: 12px;
+                flex: 1 1 0;
+                min-width: 0; /* 允許按鈕縮小 */
+                max-width: none;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            /* 手機版:莊和閒按鈕加長(分配原計算按鈕的空間) */
+            .btn-banker,
+            .btn-player {
+                flex: 1.5 1 0; /* 比其他按鈕寬 50% */
+            }
+
+            .btn i {
+                display: none; /* 手機版隱藏圖標節省空間 */
+            }
+
+            .random-group {
+                width: 100%;
+                display: block; /* 改為 block */
+                margin: 0;
+                padding: 0;
+            }
+
+            .btn-random {
+                flex: 0 0 auto;
+                padding: 6px 8px;
+                font-size: 11px;
+                white-space: nowrap;
+                margin: 0;
+                margin-right: 4px;
+            }
+
+            .random-inputs {
+                display: flex;
+                gap: 3px;
+                align-items: center;
+                flex-wrap: wrap;
+                width: 100%;
+            }
+
+            .random-input {
+                width: 40px;
+                padding: 5px 2px;
+                font-size: 11px;
+                text-align: center;
+                box-sizing: border-box;
+            }
+
+            .random-label {
+                font-size: 10px;
+                flex-shrink: 0;
+                white-space: nowrap;
+            }
+            
+            /* 特定輸入框寬度調整 */
+            #jumpRatioThreshold,
+            #winRateThreshold {
+                width: 38px;
+            }
+            
+            /* 手機版 label 和勾選框優化 */
+            .random-inputs label {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 3px !important;
+                margin-left: 5px !important;
+                white-space: nowrap;
+            }
+            
+            .random-inputs input[type="checkbox"],
+            .random-inputs input[type="radio"] {
+                width: auto;
+                margin: 0;
+                padding: 0;
+            }
+            
+            /* AI 模式獨立一排 */
+            .ai-mode-row {
+                display: flex;
+                align-items: center;
+                gap: 3px;
+                flex-wrap: wrap;
+                width: 100%;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid #dee2e6; /* 改為較深的灰色 */
+            }
+            
+            .ai-mode-row label {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 3px !important;
+                white-space: nowrap;
+            }
+            
+            .ai-mode-row input[type="radio"] {
+                width: auto;
+                margin: 0;
+                padding: 0;
+            }
+
+            textarea {
+                min-height: 45px;
+                font-size: 13px;
+                margin-bottom: 8px;
+                padding: 8px;
+                width: 100%;
+                box-sizing: border-box;
+            }
+
+            /* 可摺疊區域 - 只在手機版顯示 */
+            .collapsible-toggle {
+                width: 100%;
+                padding: 5px;
+                background: #6c757d;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                font-size: 11px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                margin-top: 15px; /* 與上方按鈕保持距離,避免誤觸 */
+                margin-bottom: 8px;
+            }
+
+            .collapsible-toggle:active {
+                background: #5a6268;
+            }
+
+            .collapsible-content {
+                display: none;
+                width: 100%;
+                text-align: left; /* 內容靠左 */
+                padding: 0; /* 移除內邊距 */
+            }
+
+            .collapsible-content.show {
+                display: block;
+            }
+        }
+
+        /* 平板: 隱藏進階功能按鈕，直接顯示內容 */
+        @media (min-width: 601px) and (max-width: 1024px) {
+            .collapsible-toggle {
+                display: none;
+            }
+
+            .collapsible-content {
+                display: block !important;
+            }
+        }
+
+        /* 電腦版: 隱藏進階功能按鈕，直接顯示內容 */
+        @media (min-width: 1025px) {
+            .collapsible-toggle {
+                display: none;
+            }
+
+            .collapsible-content {
+                display: block !important;
+            }
+        }
+
+        /* 路單網格 */
+        .roads-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 10px;
+        }
+
+        .road-card {
+            background: white;
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .road-header {
+            background: #f8f9fa;
+            padding: 0.625rem 0.9375rem; /* 10px 15px */
+            border-bottom: 0.125rem solid #dee2e6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .road-name {
+            font-size: 0.875rem; /* 14px */
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .road-count {
+            font-size: 0.75rem; /* 12px */
+            color: #6c757d;
+        }
+
+        /* 珠盤路顯示區 - 使用固定像素確保格子對齊 */
+        .bead-road {
+            padding: 10px;
+            background: white;
+            min-height: 180px;
+            overflow-x: auto;
+        }
+
+        .bead-grid {
+            display: inline-grid;
+            gap: 1px;
+            background: #dee2e6;
+            border: 1px solid #adb5bd;
+        }
+
+        .bead-cell {
+            width: 26px;
+            height: 26px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .grid-number {
+            font-size: 9px;
+            color: #6c757d;
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .row-number {
+            font-size: 9px;
+            color: #6c757d;
+            font-weight: 600;
+            background: #f8f9fa;
+        }
+
+        .bead {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        .bead-B {
+            background: #dc3545;
+        }
+
+        .bead-P {
+            background: #0d6efd;
+        }
+
+        /* 統計資訊 - 使用固定像素確保對齊 */
+        .road-stats {
+            padding: 6px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .stat-box-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-height: 26px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .stat-box-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-header {
+            font-size: 9px;
+            font-weight: 700;
+            color: #212529;
+            padding: 4px 8px;
+            white-space: nowrap;
+            min-width: 130px;
+            border-right: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+        }
+
+        .stat-info {
+            font-size: 9px;
+            color: #495057;
+            line-height: 1.2;
+            padding: 4px 8px;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .stat-beads-container {
+            padding: 6px;
+            overflow-x: auto;
+            background: white;
+        }
+
+        .stat-beads-grid {
+            display: inline-grid;
+            gap: 1px;
+            background: #dee2e6;
+            border: 1px solid #adb5bd;
+        }
+
+        .stat-bead-cell {
+            width: 24px;
+            height: 24px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-row-number {
+            font-size: 8px;
+            color: #6c757d;
+            font-weight: 600;
+            background: #f8f9fa;
+            width: 18px;
+        }
+
+        .stat-bead {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+        }
+
+        .stat-bead-hit {
+            background: #dc3545;
+        }
+
+        .stat-bead-miss {
+            background: #0d6efd;
+        }
+
+        /* 預測區 */
+        .prediction-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #dee2e6;
+        }
+
+        .pred-box {
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .pred-header {
+            padding: 6px;
+            text-align: center;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .pred-follow {
+            background: #28a745;
+        }
+
+        .pred-counter {
+            background: #6f42c1;
+        }
+
+        .pred-content {
+            padding: 8px;
+            background: #f8f9fa;
+        }
+
+        .pred-result {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #212529;
+            text-align: center;
+        }
+
+        .pred-beads-container {
+            margin-bottom: 8px;
+            padding: 5px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pred-beads-grid {
+            display: inline-grid;
+            gap: 2px;
+        }
+
+        .pred-bead-cell {
+            width: 20px;
+            height: 20px;
+            background: white;
+            border: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pred-bead {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .pred-bead-hit {
+            background: #dc3545;
+        }
+
+        .pred-bead-miss {
+            background: #0d6efd;
+        }
+
+        .pred-stats {
+            font-size: 10px;
+            color: #6c757d;
+            text-align: center;
+        }
+
+        /* AI預測區 */
+        .ai-prediction {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 0.9375rem; /* 15px */
+            margin-bottom: 0.625rem; /* 10px */
+            border-radius: 0.5rem; /* 8px */
+            box-shadow: 0 0.25rem 0.375rem rgba(0,0,0,0.1);
+            color: white;
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem; /* 10px */
+            margin-bottom: 0.75rem; /* 12px */
+            font-size: 1.125rem; /* 18px */
+            font-weight: 700;
+        }
+
+        .ai-content {
+            background: rgba(255,255,255,0.15);
+            border-radius: 0.375rem; /* 6px */
+            padding: 0.75rem; /* 12px */
+            backdrop-filter: blur(10px);
+        }
+
+        .ai-main-prediction {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.9375rem; /* 15px */
+            margin-bottom: 0.75rem; /* 12px */
+            padding: 0.9375rem; /* 15px */
+            background: rgba(255,255,255,0.2);
+            border-radius: 0.375rem; /* 6px */
+        }
+
+        .ai-label {
+            font-size: 1rem; /* 16px */
+            font-weight: 600;
+        }
+
+        .ai-result {
+            font-size: 2rem; /* 32px */
+            font-weight: 900;
+            text-shadow: 0.125rem 0.125rem 0.25rem rgba(0,0,0,0.3);
+            padding: 0.3125rem 1.25rem; /* 5px 20px */
+            background: rgba(255,255,255,0.3);
+            border-radius: 0.5rem; /* 8px */
+        }
+
+        .ai-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr)); /* 200px */
+            gap: 0.5rem; /* 8px */
+            margin-bottom: 0.625rem; /* 10px */
+        }
+
+        .ai-stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 0.5rem 0.75rem; /* 8px 12px */
+            border-radius: 0.375rem; /* 6px */
+            font-size: 0.8125rem; /* 13px */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .ai-stat-label {
+            font-weight: 600;
+        }
+
+        .ai-stat-value {
+            font-weight: 700;
+            font-size: 0.9375rem; /* 15px */
+        }
+
+        .ai-warnings {
+            background: rgba(255,255,255,0.25);
+            padding: 0.625rem; /* 10px */
+            border-radius: 0.375rem; /* 6px */
+            margin-top: 0.625rem; /* 10px */
+        }
+
+        .ai-warning-title {
+            font-weight: 700;
+            font-size: 0.875rem; /* 14px */
+            margin-bottom: 0.5rem; /* 8px */
+            display: flex;
+            align-items: center;
+            gap: 0.3125rem; /* 5px */
+        }
+
+        .ai-warning-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3125rem; /* 5px */
+        }
+
+        .ai-warning-item {
+            background: rgba(255,255,255,0.3);
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .warning-badge {
+            background: #ff4757;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .roads-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-prediction {
+                margin-bottom: 10px;
+            }
+
+            .ai-main-prediction {
+                padding: 12px;
+                flex-direction: column !important;
+                justify-content: center !important;
+            }
+
+            .ai-result {
+                font-size: 28px;
+            }
+
+            .ai-stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* 手機版重注建議位置調整到右上角 */
+            .heavy-bet-alert {
+                position: absolute !important;
+                right: 12px !important;
+                top: 12px !important;
+                margin-left: 0 !important;
+                font-size: 12px !important;
+                padding: 3px 10px !important;
+            }
+            
+            .long-dragon-alert {
+                position: absolute !important;
+                right: 12px !important;
+                top: 42px !important; /* 放在重注提醒下方 */
+                margin-left: 0 !important;
+                font-size: 12px !important;
+                padding: 3px 10px !important;
+            }
+            
+            /* 手機版特定調整 - rem 單位會自動根據螢幕大小縮放 */
+            .ai-main-prediction {
+                min-height: 5rem; /* 確保雙提醒時有足夠空間 */
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .ai-prediction {
+                margin-bottom: 10px;
+            }
+        }
+
+        /* 曲線圖模態視窗 */
+        .chart-modal {
+            display: none;
+            position: fixed;
+            z-index: 9999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            overflow: auto;
+        }
+
+        .chart-modal-content {
+            background-color: white;
+            margin: 2% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 1400px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .chart-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .chart-modal-header h2 {
+            color: #333;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        .chart-close {
+            color: #aaa;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .chart-close:hover {
+            color: #000;
+        }
+
+        .chart-options {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .chart-checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .chart-checkbox-label:hover {
+            border-color: #667eea;
+            background: #f0f0ff;
+        }
+
+        .chart-checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .chart-canvas-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .btn-chart {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-chart:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        .chart-data-table {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .chart-data-table h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .chart-data-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .chart-data-table table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .chart-data-table th,
+        .chart-data-table td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .chart-data-table th {
+            background: #667eea;
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        .chart-data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .result-b {
+            color: #ff0000;
+            font-weight: bold;
+        }
+
+        .result-p {
+            color: #0066ff;
+            font-weight: bold;
+        }
+
+        .mobile-only {
+            display: none;
+        }
+
+        .desktop-only {
+            display: inline;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-only {
+                display: inline;
+            }
+
+            .desktop-only {
+                display: none;
+            }
+            .chart-modal-content {
+                width: 98%;
+                padding: 10px;
+                margin: 1% auto;
+                max-height: 95vh;
+            }
+
+            .chart-modal-header {
+                margin-bottom: 10px;
+                padding-bottom: 10px;
+            }
+
+            .chart-modal-header h2 {
+                font-size: 16px;
+            }
+
+            .chart-close {
+                font-size: 28px;
+            }
+
+            .chart-options {
+                gap: 6px;
+                padding: 10px;
+            }
+
+            .chart-checkbox-label {
+                font-size: 11px;
+                padding: 5px 8px;
+            }
+
+            .chart-canvas-container {
+                padding: 10px;
+                overflow-x: auto;
+            }
+
+            .chart-canvas-container canvas {
+                max-width: 100%;
+                height: auto !important;
+            }
+
+            .chart-data-table {
+                padding: 10px;
+            }
+
+            .chart-data-table h3 {
+                font-size: 14px;
+                margin-bottom: 10px;
+            }
+
+            .chart-data-table table {
+                min-width: 0;
+                font-size: 10px;
+            }
+
+            .chart-data-table th,
+            .chart-data-table td {
+                padding: 4px 2px;
+                font-size: 10px;
+                white-space: normal;
+                word-break: break-word;
+            }
+
+            /* 手機版表頭縮寫 */
+            .chart-data-table th:nth-child(1) { width: 8%; }  /* 局數 */
+            .chart-data-table th:nth-child(2) { width: 8%; }  /* 結果 */
+            .chart-data-table th:nth-child(3) { width: 10%; } /* 莊累計 */
+            .chart-data-table th:nth-child(4) { width: 10%; } /* 閒累計 */
+            .chart-data-table th:nth-child(5) { width: 10%; } /* 總局數 */
+            .chart-data-table th:nth-child(6) { width: 18%; } /* 莊比率 */
+            .chart-data-table th:nth-child(7) { width: 18%; } /* 閒比率 */
+            .chart-data-table th:nth-child(8) { width: 18%; } /* 跳連比率 */
+        }
+    </style>
+</head>
+<body>
+    <!-- 激活界面 -->
+    <div id="activationScreen">
+        <div class="activation-container">
+            <div class="activation-header">
+                <h1>🎰 富沐國際</h1>
+                <p>百家樂多路單分析系統</p>
+            </div>
+
+            <div class="activation-info-box">
+                💡 <strong>激活說明：</strong><br>
+                1️⃣ 複製下方的<strong>邀請碼</strong>發送給管理員<br>
+                2️⃣ 管理員會生成<strong>激活碼</strong>給您<br>
+                3️⃣ 輸入激活碼後即可使用系統
+            </div>
+
+            <div class="activation-group">
+                <label>📱 您的邀請碼 (設備ID)</label>
+                <div class="device-id-display">
+                    <span id="deviceIdDisplay">載入中...</span>
+                    <button class="copy-device-id-btn" onclick="copyDeviceId()">
+                        <i class="fas fa-copy"></i> 複製
+                    </button>
+                </div>
+            </div>
+
+            <div class="activation-group">
+                <label>🔑 輸入激活碼</label>
+                <input type="text" 
+                       id="activationCodeInput" 
+                       class="activation-input" 
+                       placeholder="請輸入12位激活碼"
+                       maxlength="12"
+                       autocomplete="off"
+                       autocapitalize="characters">
+            </div>
+
+            <button class="activation-btn" onclick="activateApp()">
+                <i class="fas fa-unlock"></i> 激活系統
+            </button>
+
+            <div id="activationMessage"></div>
+
+            <div class="activation-footer">
+                © 2025 富沐國際 | 激活啟動系統
+            </div>
+        </div>
+    </div>
+
+    <!-- 主應用 -->
+    <div id="mainApp">
+        <div class="container">
+            <!-- 頁首 -->
+            <div class="header">
+                <div class="header-title">
+                    <h1>富沐國際-多路單分析系統</h1>
+                </div>
+            </div>
+
+        <!-- 輸入區 -->
+        <div class="input-section">
+            <textarea id="inputSeq" placeholder="輸入開牌記錄 (B=莊, P=閒)&#10;範例: BPBPPBBBPBPB"></textarea>
+            <div class="input-controls">
+                <button class="btn btn-banker" onclick="addResult('B')">莊 (B)</button>
+                <button class="btn btn-player" onclick="addResult('P')">閒 (P)</button>
+                <button class="btn btn-undo" onclick="undo()">
+                    <i class="fas fa-undo"></i> 撤銷
+                </button>
+                <button class="btn btn-chart" onclick="openChartModal()">
+                    <i class="fas fa-chart-line"></i> 曲線圖
+                </button>
+                <button class="btn btn-clear" onclick="clearAll()">清除</button>
+                
+                <!-- 可摺疊的進階功能區 -->
+                <button class="collapsible-toggle" onclick="toggleAdvanced()">
+                    <i class="fas fa-cog"></i>
+                    <span id="advancedToggleText">顯示進階功能</span>
+                    <i class="fas fa-chevron-down" id="advancedToggleIcon"></i>
+                </button>
+                
+                <div class="collapsible-content" id="advancedContent">
+                    <div class="random-group">
+                        <div class="random-inputs">
+                            <button class="btn btn-random" onclick="randomGenerate()">
+                                <i class="fas fa-dice"></i> 隨機莊閒
+                            </button>
+                            <span class="random-label">最少:</span>
+                            <input type="number" id="minCount" class="random-input" value="50" min="1" max="200">
+                            <span class="random-label">最多:</span>
+                            <input type="number" id="maxCount" class="random-input" value="70" min="1" max="200">
+                            <span class="random-label">AI局數:</span>
+                            <input type="number" id="aiStartRound" class="random-input" value="12" min="1" max="100">
+                            <span class="random-label">連跳比率:</span>
+                            <input type="number" id="jumpRatioThreshold" class="random-input" value="0.26" min="0" max="1" step="0.01">
+                            <span class="random-label">長龍:</span>
+                            <input type="number" id="longDragonThreshold" class="random-input" value="5" min="0" max="20">
+                            <span class="random-label">跳:</span>
+                            <input type="number" id="jumpPatternThreshold" class="random-input" value="2" min="0" max="10">
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer;">
+                                <input type="checkbox" id="enableWarnings" checked style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">警示</span>
+                            </label>
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer;">
+                                <input type="checkbox" id="showAiStreakCount" checked style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">AI統計</span>
+                            </label>
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer;">
+                                <input type="checkbox" id="showJumpRatio" checked style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">跳連比率</span>
+                            </label>
+                        </div>
+                        
+                        <!-- AI 模式選擇獨立一排 -->
+                        <div class="ai-mode-row">
+                            <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" id="aiModeVoteCount" name="aiMode" checked style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">總數莊閒</span>
+                            </label>
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin-left: 10px; cursor: pointer;">
+                                <input type="radio" id="aiModeWinRate" name="aiMode" style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">勝率莊閒</span>
+                            </label>
+                            <span class="random-label" style="margin-left: 10px;">勝率:</span>
+                            <input type="number" id="winRateThreshold" class="random-input" value="50" min="0" max="100" style="width: 50px;">
+                            <span class="random-label">%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI預測區 -->
+        <div id="aiPrediction" class="ai-prediction" style="display: none;">
+            <div class="ai-header">
+                <i class="fas fa-robot"></i>
+                <span>AI 智能統計預測</span>
+            </div>
+            <div class="ai-content">
+                <div class="ai-main-prediction" style="position: relative;">
+                    <span class="ai-label">AI 建議下注:</span>
+                    <span class="ai-result" id="aiMainResult">--</span>
+                    <!-- 重注提醒 -->
+                    <span class="heavy-bet-alert" id="heavyBetAlert" style="display: none; margin-left: 15px; padding: 4px 12px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border-radius: 6px; font-weight: bold; font-size: 13px; animation: pulse 1.5s infinite; box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);">
+                        💎 重注
+                    </span>
+                    <!-- 長龍提醒 -->
+                    <span class="long-dragon-alert" id="longDragonAlert" style="display: none; margin-left: 15px; padding: 4px 12px; background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%); color: white; border-radius: 6px; font-weight: bold; font-size: 13px; animation: pulse 1.5s infinite; box-shadow: 0 2px 6px rgba(255, 165, 2, 0.4);">
+                        🐉 長龍
+                    </span>
+                </div>
+                <div class="ai-stats-grid">
+                    <div class="ai-stat-item" id="aiStreakCountItem">
+                        <span class="ai-stat-label">AI統計:</span>
+                        <span class="ai-stat-value" id="aiStreakCount">正確:0 錯誤:0</span>
+                    </div>
+                    <div class="ai-stat-item">
+                        <span class="ai-stat-label">AI正確率:</span>
+                        <span class="ai-stat-value" id="aiAccuracyRate">0%</span>
+                    </div>
+                    <div class="ai-stat-item">
+                        <span class="ai-stat-label">連中/連錯提示:</span>
+                        <span class="ai-stat-value" id="aiErrorStreak" style="font-weight: 900;">--</span>
+                    </div>
+                    <div class="ai-stat-item">
+                        <span class="ai-stat-label">最多連中:</span>
+                        <span class="ai-stat-value" id="aiMaxWinStreak">0次</span>
+                    </div>
+                    <div class="ai-stat-item">
+                        <span class="ai-stat-label">最多連錯:</span>
+                        <span class="ai-stat-value" id="aiMaxLoseStreak">0次</span>
+                    </div>
+                    <div class="ai-stat-item" id="jumpRatioItem">
+                        <span class="ai-stat-label">跳連比率:</span>
+                        <span class="ai-stat-value" id="jumpRatioValue">0.00</span>
+                        <span class="ai-stat-value" id="jumpRatioHint" style="font-size: 12px; margin-left: 5px;"></span>
+                    </div>
+                </div>
+                <div class="ai-warnings" id="aiWarnings" style="display: none;">
+                    <div class="ai-warning-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>警示: 以下路單連續未中5次以上</span>
+                    </div>
+                    <div class="ai-warning-list" id="aiWarningList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 路單網格 -->
+        <div id="roadsGrid" class="roads-grid"></div>
+    </div>
+
+    <script>
+        let sequence = [];
+        let aiPredictionHistory = []; // 記錄AI的預測歷史 { prediction: 'B'/'P', actual: 'B'/'P', isCorrect: true/false }
+        let lastLongDragonLength = 0; // 記錄上次長龍的長度，用來判斷是否是新的長龍
+        let longDragonInterventionUsed = false; // 記錄長龍介入是否已使用
+        let jumpInterventionUsed = false; // 記錄跳介入是否已使用
+        
+        // 路單配置 - 根據圖片每種路單有不同的顯示行數
+        const roadConfigs = [
+            { name: '大路', size: 1, rows: 6, isBigRoad: true }, // 新增大路，支援龍尾
+            { name: '三多打', size: 3, rows: 3, isThreeMoreRoad: true },
+            { name: '二珠路', size: 2, rows: 2, isPearlRoad: true },
+            { name: '三珠路', size: 3, rows: 3, isPearlRoad: true },
+            { name: '四珠路', size: 4, rows: 4, isPearlRoad: true },
+            { name: '五珠路', size: 5, rows: 5, isPearlRoad: true },
+            { name: '六珠路', size: 6, rows: 6, isPearlRoad: true },
+            { name: '七珠路', size: 7, rows: 7, isPearlRoad: true },
+            { name: '微笑路', size: 3, rows: 6, isSmilePath: true },
+            { name: '跳投路', size: 2, rows: 2, isJumpPath: true },
+            { name: '巽震路', size: 3, rows: 3, isXunZhenRoad: true, patterns: ['BBP', 'PPB'] },
+            { name: '兌艮路', size: 3, rows: 3, isDuiGenRoad: true, patterns: ['PBB', 'BPP'] },
+            { name: '離坎路', size: 3, rows: 3, isLiKanRoad: true, patterns: ['BPB', 'PBP'] }
+        ];
+
+        // 檢查登入 (單機版 - 移除驗證)
+        async function checkLoginStatus() {
+            // 單機版不需要登入，但保持 async 結構以模擬網路請求延遲
+            return new Promise((resolve) => {
+                // 確保 DOM 元素已經存在
+                setTimeout(() => {
+                    const userDisplay = document.getElementById('userDisplay');
+                    if (userDisplay) {
+                        userDisplay.textContent = '單機版用戶';
+                    }
+                    resolve();
+                }, 10); // 10ms 延遲，確保DOM完全載入
+            });
+        }
+
+        // 登出 (單機版 - 移除功能)
+        function logout() {
+            alert('單機版無需登出功能');
+        }
+
+        // 添加結果
+        function addResult(result) {
+            // 在添加新結果前,先檢查是否有AI預測,並記錄預測結果
+            const aiResultElement = document.getElementById('aiMainResult');
+            
+            if (aiResultElement && aiResultElement.textContent !== '--') {
+                const aiPredText = aiResultElement.textContent.trim();
+                let aiPrediction = null;
+                
+                if (aiPredText.includes('莊') || aiPredText.includes('(B)')) {
+                    aiPrediction = 'B';
+                } else if (aiPredText.includes('閒') || aiPredText.includes('(P)')) {
+                    aiPrediction = 'P';
+                }
+                
+                // 如果有有效的AI預測,記錄這次預測和實際結果
+                if (aiPrediction) {
+                    const isCorrect = (aiPrediction === result);
+                    aiPredictionHistory.push({
+                        prediction: aiPrediction,
+                        actual: result,
+                        isCorrect: isCorrect
+                    });
+                }
+            }
+            
+            document.getElementById('inputSeq').value += result;
+            analyzeAll(); // 即時分析
+        }
+
+        // 撤銷最後一個輸入
+        function undo() {
+            const textarea = document.getElementById('inputSeq');
+            const current = textarea.value;
+            if (current.length > 0) {
+                // 刪除最後一個輸入
+                textarea.value = current.slice(0, -1);
+                
+                // 同時刪除最後一筆AI預測歷史記錄
+                if (aiPredictionHistory.length > 0) {
+                    aiPredictionHistory.pop();
+                }
+                
+                // 重新分析
+                analyzeAll();
+            }
+        }
+
+        // 隨機生成莊閒
+        function randomGenerate() {
+            const minCount = parseInt(document.getElementById('minCount').value) || 50;
+            const maxCount = parseInt(document.getElementById('maxCount').value) || 70;
+            
+            // 驗證範圍
+            if (minCount > maxCount) {
+                alert('最少數量不能大於最多數量！');
+                return;
+            }
+            
+            if (minCount < 1 || maxCount > 200) {
+                alert('數量範圍必須在 1-200 之間！');
+                return;
+            }
+            
+            // 隨機生成數量
+            const count = Math.floor(Math.random() * (maxCount - minCount + 1)) + minCount;
+            
+            // 生成隨機莊閒序列
+            let randomSeq = '';
+            for (let i = 0; i < count; i++) {
+                randomSeq += Math.random() < 0.5 ? 'B' : 'P';
+            }
+            
+            // 設置到輸入框並分析
+            document.getElementById('inputSeq').value = randomSeq;
+            analyzeAll();
+        }
+
+        // 解析輸入
+        function parseInput(input) {
+            return input.toUpperCase()
+                .replace(/莊/g, 'B')
+                .replace(/閒/g, 'P')
+                .replace(/庄/g, 'B')
+                .split('')
+                .filter(c => ['B', 'P'].includes(c));
+        }
+
+        // 切換進階功能顯示/隱藏
+        function toggleAdvanced() {
+            const content = document.getElementById('advancedContent');
+            const text = document.getElementById('advancedToggleText');
+            const icon = document.getElementById('advancedToggleIcon');
+            
+            if (content.classList.contains('show')) {
+                content.classList.remove('show');
+                text.textContent = '顯示進階功能';
+                icon.className = 'fas fa-chevron-down';
+            } else {
+                content.classList.add('show');
+                text.textContent = '隱藏進階功能';
+                icon.className = 'fas fa-chevron-up';
+            }
+        }
+
+        // 清除
+        function clearAll() {
+            document.getElementById('inputSeq').value = '';
+            sequence = [];
+            aiPredictionHistory = []; // 清除AI預測歷史
+            lastLongDragonLength = 0; // 重置長龍狀態
+            longDragonInterventionUsed = false; // 重置長龍介入標記
+            jumpInterventionUsed = false; // 重置跳介入標記
+            initializeEmptyRoads();
+            // 隱藏 AI 預測區塊
+            document.getElementById('aiPrediction').style.display = 'none';
+        }
+
+        // 初始化空路單
+        function initializeEmptyRoads() {
+            console.log('開始初始化空路單...');
+            const grid = document.getElementById('roadsGrid');
+            if (!grid) {
+                console.error('錯誤：找不到 roadsGrid 元素！');
+                return;
+            }
+            console.log('找到 roadsGrid 元素，準備清空並重新生成...');
+            grid.innerHTML = '';
+
+            roadConfigs.forEach((config, index) => {
+                console.log(`生成第 ${index + 1} 個路單：${config.name}`);
+                grid.appendChild(createEmptyRoadCard(config));
+            });
+            console.log(`完成！共生成 ${roadConfigs.length} 個空路單`);
+        }
+
+        // 創建空路單卡片
+        function createEmptyRoadCard(config) {
+            const card = document.createElement('div');
+            card.className = 'road-card';
+
+            const header = document.createElement('div');
+            header.className = 'road-header';
+            header.innerHTML = `
+                <span class="road-name">${config.name}</span>
+            `;
+            card.appendChild(header);
+
+            // 空的珠盤路格子
+            const beadRoad = createBeadRoad([], config.rows, true);
+            card.appendChild(beadRoad);
+
+            // 大路不需要統計，直接返回
+            if (config.isBigRoad) {
+                return card;
+            }
+
+            // 統計資訊 (在珠盤路下方)
+            const statsInfo = document.createElement('div');
+            statsInfo.className = 'road-stats';
+            
+            // 根據路單類型決定標籤
+            let followLabel = '正打';
+            let counterLabel = '反打';
+            if (config.isThreeMoreRoad) {
+                followLabel = '正打';
+                counterLabel = '反打';
+            } else if (config.isSmilePath) {
+                followLabel = '打連';
+                counterLabel = '打跳';
+            } else if (config.isJumpPath) {
+                followLabel = '莊閒';
+                counterLabel = '閒莊';
+            } else if (config.isXunZhenRoad) {
+                followLabel = '莊莊閒';
+                counterLabel = '閒閒莊';
+            } else if (config.isDuiGenRoad) {
+                followLabel = '閒莊莊';
+                counterLabel = '莊閒閒';
+            } else if (config.isLiKanRoad) {
+                followLabel = '莊閒莊';
+                counterLabel = '閒莊閒';
+            }
+            
+            // 正打格子 (根據路單類型顯示對應標籤)
+            const followBox = document.createElement('div');
+            followBox.className = 'stat-box';
+            const followRow = document.createElement('div');
+            followRow.className = 'stat-box-row';
+            followRow.innerHTML = `
+                <div class="stat-header">${followLabel} 【正確: 0 錯誤: 0】</div>
+                <div class="stat-info">【勝率: 0% 負率: 0%】提示: --</div>
+            `;
+            followBox.appendChild(followRow);
+            
+            const followBeadsContainer = document.createElement('div');
+            followBeadsContainer.className = 'stat-beads-container';
+            followBeadsContainer.appendChild(createEmptyStatBeads());
+            followBox.appendChild(followBeadsContainer);
+            statsInfo.appendChild(followBox);
+
+            // 反打格子 (根據路單類型顯示對應標籤)
+            const counterBox = document.createElement('div');
+            counterBox.className = 'stat-box';
+            const counterRow = document.createElement('div');
+            counterRow.className = 'stat-box-row';
+            counterRow.innerHTML = `
+                <div class="stat-header">${counterLabel} 【正確: 0 錯誤: 0】</div>
+                <div class="stat-info">【勝率: 0% 負率: 0%】提示: --</div>
+            `;
+            counterBox.appendChild(counterRow);
+            
+            const counterBeadsContainer = document.createElement('div');
+            counterBeadsContainer.className = 'stat-beads-container';
+            counterBeadsContainer.appendChild(createEmptyStatBeads());
+            counterBox.appendChild(counterBeadsContainer);
+            statsInfo.appendChild(counterBox);
+            
+            card.appendChild(statsInfo);
+
+            return card;
+        }
+
+        // 分析所有路單
+        function analyzeAll() {
+            const input = document.getElementById('inputSeq').value;
+            sequence = parseInput(input);
+
+            if (sequence.length === 0) {
+                initializeEmptyRoads();
+                return;
+            }
+
+            generateAllRoads();
+        }
+
+        // 生成所有路單
+        function generateAllRoads() {
+            const grid = document.getElementById('roadsGrid');
+            grid.innerHTML = '';
+
+            const allStats = []; // 收集所有路單的統計數據
+
+            roadConfigs.forEach(config => {
+                // 只要有輸入就顯示路單卡片
+                if (sequence.length > 0) {
+                    const card = createRoadCard(config);
+                    grid.appendChild(card);
+                    
+                    // 收集統計數據用於AI分析
+                    const groups = [];
+                    for (let i = 0; i <= sequence.length - config.size; i++) {
+                        groups.push(sequence.slice(i, i + config.size));
+                    }
+                    const stats = calculateStats(groups, config);
+                    allStats.push({
+                        name: config.name,
+                        stats: stats,
+                        config: config
+                    });
+                } else {
+                    grid.appendChild(createEmptyRoadCard(config));
+                }
+            });
+
+            // 執行AI分析
+            if (sequence.length > 0) {
+                performAIAnalysis(allStats);
+            } else {
+                document.getElementById('aiPrediction').style.display = 'none';
+            }
+            
+            // 自動滾動所有珠盤路到最新數據位置(不是空白區)
+            setTimeout(() => {
+                const allBeadRoads = document.querySelectorAll('.bead-road');
+                allBeadRoads.forEach(beadRoad => {
+                    const lastCol = parseInt(beadRoad.getAttribute('data-last-col') || '0');
+                    
+                    // 計算滾動位置: 每列26px + 左側行號20px + gap 1px
+                    // 滾動到最後一列數據,並保留一些可視空間
+                    const cellWidth = 27; // 26px + 1px gap
+                    const leftLabelWidth = 20;
+                    const viewportWidth = beadRoad.clientWidth;
+                    
+                    // 計算目標滾動位置:讓最後一列數據顯示在可視區域內
+                    const targetScrollLeft = Math.max(0, (lastCol + 1) * cellWidth + leftLabelWidth - viewportWidth + cellWidth * 2);
+                    
+                    beadRoad.scrollLeft = targetScrollLeft;
+                });
+            }, 100); // 延遲確保DOM完全渲染
+        }
+
+        // AI分析函數
+        function performAIAnalysis(allStats) {
+            // 獲取 AI 計算模式
+            const aiModeVoteCount = document.getElementById('aiModeVoteCount').checked; // 總數莊閒模式
+            const aiModeWinRate = document.getElementById('aiModeWinRate').checked; // 勝率莊閒模式
+            const winRateThreshold = parseFloat(document.getElementById('winRateThreshold')?.value) || 50; // 勝率閾值
+            
+            let bankerVotes = 0;
+            let playerVotes = 0;
+            let bankerWinRateSum = 0;
+            let playerWinRateSum = 0;
+            let validRoads = 0;
+            const warnings = [];
+
+            allStats.forEach(item => {
+                const { name, stats, config } = item;
+                
+                // 跳過沒有預測的路單
+                if (!stats.followPred || !stats.counterPred) return;
+                
+                validRoads++;
+                
+                // 分析正打預測
+                const followPred = stats.followPred[stats.followPred.length - 1];
+                const counterPred = stats.counterPred[stats.counterPred.length - 1];
+                
+                // 計算勝率
+                const followWinRate = stats.followTotal > 0 ? (stats.followHits / stats.followTotal) * 100 : 0;
+                const counterWinRate = stats.counterTotal > 0 ? (stats.counterHits / stats.counterTotal) * 100 : 0;
+                
+                // 根據路單類型獲取標籤
+                let followLabel = '正打';
+                let counterLabel = '反打';
+                if (config.isThreeMoreRoad) {
+                    followLabel = '正打';
+                    counterLabel = '反打';
+                } else if (config.isSmilePath) {
+                    followLabel = '打連';
+                    counterLabel = '打跳';
+                } else if (config.isJumpPath) {
+                    followLabel = '莊閒';
+                    counterLabel = '閒莊';
+                } else if (config.isXunZhenRoad) {
+                    followLabel = '莊莊閒';
+                    counterLabel = '閒閒莊';
+                } else if (config.isDuiGenRoad) {
+                    followLabel = '閒莊莊';
+                    counterLabel = '莊閒閒';
+                } else if (config.isLiKanRoad) {
+                    followLabel = '莊閒莊';
+                    counterLabel = '閒莊閒';
+                }
+                
+                // === 投票邏輯 ===
+                if (aiModeVoteCount) {
+                    // 模式1: 總數莊閒 - 投票給勝率更高的選項
+                    if (followWinRate >= counterWinRate && followPred !== '停') {
+                        if (followPred === 'B') {
+                            bankerVotes++;
+                            bankerWinRateSum += followWinRate;
+                        } else if (followPred === 'P') {
+                            playerVotes++;
+                            playerWinRateSum += followWinRate;
+                        }
+                    } else if (counterPred !== '停') {
+                        if (counterPred === 'B') {
+                            bankerVotes++;
+                            bankerWinRateSum += counterWinRate;
+                        } else if (counterPred === 'P') {
+                            playerVotes++;
+                            playerWinRateSum += counterWinRate;
+                        }
+                    }
+                } else if (aiModeWinRate) {
+                    // 模式2: 勝率莊閒 - 只統計勝率 >= 自訂閾值的預測
+                    if (followWinRate >= winRateThreshold && followPred !== '停') {
+                        if (followPred === 'B') {
+                            bankerVotes++;
+                            bankerWinRateSum += followWinRate;
+                        } else if (followPred === 'P') {
+                            playerVotes++;
+                            playerWinRateSum += followWinRate;
+                        }
+                    }
+                    
+                    if (counterWinRate >= winRateThreshold && counterPred !== '停') {
+                        if (counterPred === 'B') {
+                            bankerVotes++;
+                            bankerWinRateSum += counterWinRate;
+                        } else if (counterPred === 'P') {
+                            playerVotes++;
+                            playerWinRateSum += counterWinRate;
+                        }
+                    }
+                }
+                
+                // 檢查連續未中5次以上
+                const followMissStreak = countMissStreak(stats.followResults);
+                const counterMissStreak = countMissStreak(stats.counterResults);
+                
+                if (followMissStreak >= 5) {
+                    warnings.push({
+                        road: name,
+                        type: followLabel,
+                        streak: followMissStreak
+                    });
+                }
+                
+                if (counterMissStreak >= 5) {
+                    warnings.push({
+                        road: name,
+                        type: counterLabel,
+                        streak: counterMissStreak
+                    });
+                }
+            });
+
+            // 顯示AI預測結果
+            const aiPrediction = document.getElementById('aiPrediction');
+            aiPrediction.style.display = 'block';
+            
+            // === 長龍和跳的介入邏輯 ===
+            const longDragonThreshold = parseInt(document.getElementById('longDragonThreshold')?.value) || 0;
+            const jumpPatternThreshold = parseInt(document.getElementById('jumpPatternThreshold')?.value) || 0;
+            
+            let longDragonIntervention = null; // 長龍介入建議
+            let jumpPatternIntervention = null; // 跳介入建議
+            
+            // 檢查長龍（連續相同結果）- 只有設定值大於0才啟用
+            if (longDragonThreshold > 0 && sequence.length >= longDragonThreshold) {
+                // 計算當前連續相同的長度
+                let currentStreak = 1;
+                const lastResult = sequence[sequence.length - 1];
+                for (let i = sequence.length - 2; i >= 0; i--) {
+                    if (sequence[i] === lastResult) {
+                        currentStreak++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                // 檢查是否達到長龍閾值 - 只在恰好等於閾值時介入一次
+                if (currentStreak === longDragonThreshold && !longDragonInterventionUsed) {
+                    // 剛好達到設定次數(如5次),介入一次
+                    longDragonIntervention = lastResult; // 'B' 或 'P'
+                    longDragonInterventionUsed = true; // 標記已使用介入
+                    console.log(`🐉 長龍介入: 已連續${currentStreak}個${longDragonIntervention === 'B' ? '莊' : '閒'}，建議下注${longDragonIntervention === 'B' ? '莊' : '閒'}（介入一次）`);
+                } else if (currentStreak >= longDragonThreshold) {
+                    // 超過閾值(第6、7、8...次)，不介入，回到AI建議
+                    longDragonIntervention = null;
+                    console.log(`🐉 長龍持續中: ${currentStreak}個${lastResult === 'B' ? '莊' : '閒'}（回到AI建議）`);
+                } else {
+                    // 長龍中斷了，重置狀態
+                    if (longDragonInterventionUsed) {
+                        console.log(`🐉 長龍已中斷，重置狀態`);
+                    }
+                    longDragonInterventionUsed = false;
+                }
+            } else {
+                // 沒有達到長龍條件，重置狀態
+                if (lastLongDragonLength > 0) {
+                    lastLongDragonLength = 0;
+                    longDragonInterventionUsed = false;
+                }
+            }
+            
+            // 檢查跳（莊閒交替）- 只有設定值大於0才啟用
+            if (jumpPatternThreshold > 0 && sequence.length >= jumpPatternThreshold * 2) {
+                // 從最後往前檢查連續交替的長度
+                // BPBP = 4個連續交替 = 2組 (每2個算1組)
+                // PBPB = 4個連續交替 = 2組
+                // BPBPPB = BP(2個)然後PP中斷 = 1組
+                let consecutiveAlternatingLength = 1; // 至少有最後一個
+                let i = sequence.length - 1;
+                
+                // 從最後一個往前檢查,計算連續交替的長度
+                while (i >= 1) {
+                    if (sequence[i] !== sequence[i - 1]) {
+                        consecutiveAlternatingLength++;
+                        i--;
+                    } else {
+                        // 遇到連續相同就停止
+                        break;
+                    }
+                }
+                
+                // 完整跳組數 = 連續交替長度 / 2 (無條件捨去)
+                const completeJumpGroups = Math.floor(consecutiveAlternatingLength / 2);
+                
+                console.log(`🔄 跳檢查: 連續交替長度=${consecutiveAlternatingLength}, 完整跳組數=${completeJumpGroups} (設定閾值:${jumpPatternThreshold}組)`);
+                
+                // 只在恰好等於閾值且未介入時才介入
+                if (completeJumpGroups === jumpPatternThreshold && !jumpInterventionUsed) {
+                    // 恰好達到N組,介入一次
+                    const lastResult = sequence[sequence.length - 1];
+                    jumpPatternIntervention = lastResult === 'B' ? 'P' : 'B';
+                    jumpInterventionUsed = true;
+                    console.log(`🔄 跳介入: 已連續跳了${completeJumpGroups}組（長度${consecutiveAlternatingLength}），建議下注${jumpPatternIntervention === 'B' ? '莊' : '閒'}（介入一次）`);
+                } else if (completeJumpGroups >= jumpPatternThreshold && jumpInterventionUsed) {
+                    // 超過閾值且已介入過,回到AI建議
+                    jumpPatternIntervention = null;
+                    console.log(`🔄 跳持續中: ${completeJumpGroups}組（已介入過，回到AI建議）`);
+                } else if (completeJumpGroups < jumpPatternThreshold) {
+                    // 跳中斷了,重置狀態
+                    if (jumpInterventionUsed) {
+                        console.log(`🔄 跳已中斷，重置狀態`);
+                    }
+                    jumpInterventionUsed = false;
+                    jumpPatternIntervention = null;
+                }
+            } else {
+                // 沒有達到跳條件,重置狀態
+                jumpInterventionUsed = false;
+                jumpPatternIntervention = null;
+            }
+            
+            // 優先順序: 長龍 > 跳 > AI統計
+            let finalSuggestion = bankerVotes > playerVotes ? 'B' : (playerVotes > bankerVotes ? 'P' : null);
+            let interventionType = null;
+            
+            if (longDragonIntervention) {
+                finalSuggestion = longDragonIntervention;
+                interventionType = 'dragon';
+            } else if (jumpPatternIntervention) {
+                finalSuggestion = jumpPatternIntervention;
+                interventionType = 'jump';
+            }
+            
+            // 主要建議 (文字白色，框框背景根據結果變色)
+            const aiMainResultElement = document.getElementById('aiMainResult');
+            if (finalSuggestion === 'B') {
+                aiMainResultElement.textContent = '莊 (B)' + (interventionType === 'dragon' ? ' 🐉' : interventionType === 'jump' ? ' 🔄' : '');
+                aiMainResultElement.style.color = '#ffffff'; // 白色文字
+                aiMainResultElement.style.background = '#ff4757'; // 紅色背景
+                aiMainResultElement.style.fontWeight = 'bold';
+            } else if (finalSuggestion === 'P') {
+                aiMainResultElement.textContent = '閒 (P)' + (interventionType === 'dragon' ? ' 🐉' : interventionType === 'jump' ? ' 🔄' : '');
+                aiMainResultElement.style.color = '#ffffff'; // 白色文字
+                aiMainResultElement.style.background = '#1e90ff'; // 藍色背景
+                aiMainResultElement.style.fontWeight = 'bold';
+            } else {
+                aiMainResultElement.textContent = '看一把';
+                aiMainResultElement.style.color = '#ffffff'; // 白色文字
+                aiMainResultElement.style.background = 'rgba(255,255,255,0.3)'; // 保持半透明白色
+                aiMainResultElement.style.fontWeight = 'normal';
+            }
+            
+            // 重注判斷邏輯
+            const heavyBetAlert = document.getElementById('heavyBetAlert');
+            let matchingRoadsCount = 0; // 符合條件的路數計數
+            
+            // 先確定AI建議的方向
+            const aiSuggestion = bankerVotes > playerVotes ? 'B' : (playerVotes > bankerVotes ? 'P' : null);
+            
+            // 只有當AI有明確建議時才檢查
+            if (aiSuggestion) {
+                // 檢查各珠路勝率是否有60%以上且與AI建議相同
+                allStats.forEach(item => {
+                    const { stats } = item;
+                    if (!stats.followPred || !stats.counterPred) return;
+                    
+                    const followWinRate = stats.followTotal > 0 ? (stats.followHits / stats.followTotal) * 100 : 0;
+                    const counterWinRate = stats.counterTotal > 0 ? (stats.counterHits / stats.counterTotal) * 100 : 0;
+                    
+                    // 檢查正打勝率
+                    if (followWinRate >= 60) {
+                        const followPred = stats.followPred[stats.followPred.length - 1];
+                        // 檢查是否與AI建議相同
+                        if (followPred === aiSuggestion) {
+                            matchingRoadsCount++;
+                        }
+                    }
+                    
+                    // 檢查反打勝率
+                    if (counterWinRate >= 60) {
+                        const counterPred = stats.counterPred[stats.counterPred.length - 1];
+                        // 檢查是否與AI建議相同
+                        if (counterPred === aiSuggestion) {
+                            matchingRoadsCount++;
+                        }
+                    }
+                });
+            }
+            
+            // 顯示或隱藏重注提醒 (需要4路以上符合條件)
+            if (matchingRoadsCount >= 4) {
+                heavyBetAlert.style.display = 'inline-block';
+            } else {
+                heavyBetAlert.style.display = 'none';
+            }
+            
+            // 統計數據 (已移除建議路數和平均勝率顯示)
+            // document.getElementById('aiBankerCount').textContent = bankerVotes;
+            // document.getElementById('aiPlayerCount').textContent = playerVotes;
+            
+            // const avgBankerWinRate = bankerVotes > 0 ? (bankerWinRateSum / bankerVotes).toFixed(1) : 0;
+            // const avgPlayerWinRate = playerVotes > 0 ? (playerWinRateSum / playerVotes).toFixed(1) : 0;
+            // document.getElementById('aiBankerWinRate').textContent = avgBankerWinRate + '%';
+            // document.getElementById('aiPlayerWinRate').textContent = avgPlayerWinRate + '%';
+            
+            // 計算AI預測歷史的正確和錯誤次數
+            let aiCorrectCount = 0;
+            let aiWrongCount = 0;
+            let aiCurrentStreak = 0;
+            
+            // 統計歷史記錄
+            aiPredictionHistory.forEach(record => {
+                if (record.isCorrect) {
+                    aiCorrectCount++;
+                } else {
+                    aiWrongCount++;
+                }
+            });
+            
+            // 計算當前連對或連錯，以及最多連中和最多連錯
+            let consecutiveStreak = 0;
+            let isWinStreak = false;
+            let maxWinStreak = 0;  // 最多連中次數
+            let maxLoseStreak = 0; // 最多連錯次數
+            
+            if (aiPredictionHistory.length > 0) {
+                const lastResult = aiPredictionHistory[aiPredictionHistory.length - 1].isCorrect;
+                let streak = 0;
+                
+                for (let i = aiPredictionHistory.length - 1; i >= 0; i--) {
+                    if (aiPredictionHistory[i].isCorrect === lastResult) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+                
+                aiCurrentStreak = lastResult ? streak : -streak;
+                consecutiveStreak = streak;
+                isWinStreak = lastResult;
+                
+                // 計算歷史上最多連中和最多連錯
+                let currentWinStreak = 0;
+                let currentLoseStreak = 0;
+                
+                for (let i = 0; i < aiPredictionHistory.length; i++) {
+                    if (aiPredictionHistory[i].isCorrect) {
+                        currentWinStreak++;
+                        if (currentLoseStreak > 0) {
+                            maxLoseStreak = Math.max(maxLoseStreak, currentLoseStreak);
+                            currentLoseStreak = 0;
+                        }
+                    } else {
+                        currentLoseStreak++;
+                        if (currentWinStreak > 0) {
+                            maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
+                            currentWinStreak = 0;
+                        }
+                    }
+                }
+                
+                // 處理最後一段連續
+                maxWinStreak = Math.max(maxWinStreak, currentWinStreak);
+                maxLoseStreak = Math.max(maxLoseStreak, currentLoseStreak);
+            }
+            
+            // 顯示正確/錯誤次數
+            const streakText = `正確:${aiCorrectCount} 錯誤:${aiWrongCount}`;
+            document.getElementById('aiStreakCount').textContent = streakText;
+            
+            // 計算並顯示 AI 正確率 (只計算超過設定局數後的預測)
+            const aiStartRoundInput = document.getElementById('aiStartRound');
+            let aiStartRound = parseInt(aiStartRoundInput.value, 10);
+            
+            // 驗證輸入值的有效性 (只在內部使用修正值,不改變用戶輸入)
+            // 如果輸入框為空或無效,使用預設值12
+            if (!aiStartRoundInput.value || isNaN(aiStartRound) || aiStartRound < 1) {
+                aiStartRound = 12; // 使用預設值但不修改輸入框
+            } else if (aiStartRound > 100) {
+                aiStartRound = 100; // 限制最大值但不修改輸入框
+            }
+            
+            // ========================================
+            // AI正確率計算 (完全根據你按的次數)
+            // ========================================
+            let accuracyRate = 0;
+            
+            console.log('=== AI正確率計算 ===');
+            console.log('你按的總次數 (sequence.length):', sequence.length);
+            console.log('AI局數設定 (aiStartRound):', aiStartRound);
+            console.log('AI預測記錄數 (aiPredictionHistory.length):', aiPredictionHistory.length);
+            
+            // 完全根據你按的次數來判斷
+            if (sequence.length > aiStartRound) {
+                // 你按了幾次就要檢查幾次
+                // 設定12局,你按了15次 → 要檢查 15-12=3 次
+                const totalRoundsToCheck = sequence.length - aiStartRound;
+                
+                console.log('要檢查的次數 (你按的次數 - AI局數):', totalRoundsToCheck);
+                
+                let correctCount = 0;
+                
+                // 檢查最近的 totalRoundsToCheck 個AI預測
+                // 從 aiPredictionHistory 的後面往前數
+                const startCheckIdx = aiPredictionHistory.length - totalRoundsToCheck;
+                
+                console.log('從 aiPredictionHistory[' + startCheckIdx + '] 開始檢查');
+                
+                for (let i = 0; i < totalRoundsToCheck; i++) {
+                    const idx = startCheckIdx + i;
+                    if (idx >= 0 && idx < aiPredictionHistory.length) {
+                        const record = aiPredictionHistory[idx];
+                        console.log(`  檢查 [${idx}]:`, record.prediction, '→', record.actual, '=', record.isCorrect ? '✓' : '✗');
+                        if (record.isCorrect) {
+                            correctCount++;
+                        }
+                    }
+                }
+                
+                console.log('正確:', correctCount, '/ 總共:', totalRoundsToCheck);
+                
+                // 分母是你按的次數決定的,不是AI記錄數
+                accuracyRate = ((correctCount / totalRoundsToCheck) * 100).toFixed(1);
+                console.log('正確率:', accuracyRate + '%');
+            } else {
+                console.log('你還沒按超過', aiStartRound, '次,不計算');
+            }
+            
+            document.getElementById('aiAccuracyRate').textContent = accuracyRate + '%';
+            
+            // 顯示連中/連錯
+            const errorStreakElement = document.getElementById('aiErrorStreak');
+            if (consecutiveStreak > 0) {
+                if (isWinStreak) {
+                    errorStreakElement.textContent = `${consecutiveStreak}連中`;
+                    errorStreakElement.style.color = '#ffffff'; // 白色文字
+                    errorStreakElement.style.backgroundColor = '#2ed573'; // 綠色底色
+                    errorStreakElement.style.padding = '3px 10px';
+                    errorStreakElement.style.borderRadius = '4px';
+                } else {
+                    errorStreakElement.textContent = `${consecutiveStreak}連錯`;
+                    errorStreakElement.style.color = '#ffffff'; // 白色文字
+                    errorStreakElement.style.backgroundColor = consecutiveStreak >= 3 ? '#ff4757' : '#ffa502'; // 3次以上紅色底,否則橘色底
+                    errorStreakElement.style.padding = '3px 10px';
+                    errorStreakElement.style.borderRadius = '4px';
+                }
+            } else {
+                errorStreakElement.textContent = '--';
+                errorStreakElement.style.color = '#6c757d';
+                errorStreakElement.style.backgroundColor = 'transparent';
+                errorStreakElement.style.padding = '0';
+            }
+            
+            // 顯示最多連中和最多連錯
+            document.getElementById('aiMaxWinStreak').textContent = maxWinStreak + '次';
+            document.getElementById('aiMaxLoseStreak').textContent = maxLoseStreak + '次';
+            
+            // 計算並顯示跳連比率
+            if (sequence.length > 0) {
+                const jumpRatio = calculateJumpRatio(sequence, sequence.length - 1);
+                document.getElementById('jumpRatioValue').textContent = jumpRatio.toFixed(2);
+                
+                // 讀取用戶設定的連跳比率閾值
+                const jumpRatioThreshold = parseFloat(document.getElementById('jumpRatioThreshold').value) || 0.26;
+                
+                const hintElement = document.getElementById('jumpRatioHint');
+                const longDragonAlert = document.getElementById('longDragonAlert');
+                
+                if (jumpRatio > jumpRatioThreshold) {
+                    hintElement.textContent = '(跳旺)';
+                    hintElement.style.color = '#ffffff'; // 白色文字
+                    hintElement.style.backgroundColor = '#2ed573'; // 綠色底色
+                    hintElement.style.padding = '2px 8px';
+                    hintElement.style.borderRadius = '4px';
+                    // 跳旺時隱藏長龍提醒
+                    longDragonAlert.style.display = 'none';
+                } else if (jumpRatio < jumpRatioThreshold) {
+                    hintElement.textContent = '(連旺)';
+                    hintElement.style.color = '#ffffff'; // 白色文字
+                    hintElement.style.backgroundColor = '#ff6348'; // 紅色底色
+                    hintElement.style.padding = '2px 8px';
+                    hintElement.style.borderRadius = '4px';
+                    // 連旺時顯示長龍提醒
+                    longDragonAlert.style.display = 'inline-block';
+                } else {
+                    hintElement.textContent = '(平衡)';
+                    hintElement.style.color = '#ffffff'; // 白色文字
+                    hintElement.style.backgroundColor = '#ffa502'; // 橘色底色
+                    hintElement.style.padding = '2px 8px';
+                    hintElement.style.borderRadius = '4px';
+                    // 平衡時隱藏長龍提醒
+                    longDragonAlert.style.display = 'none';
+                }
+            } else {
+                document.getElementById('jumpRatioValue').textContent = '0.00';
+                document.getElementById('jumpRatioHint').textContent = '';
+            }
+            
+            // 警示訊息 (檢查是否啟用警示功能)
+            const warningsDiv = document.getElementById('aiWarnings');
+            const warningList = document.getElementById('aiWarningList');
+            const enableWarnings = document.getElementById('enableWarnings')?.checked !== false; // 預設為 true
+            
+            if (enableWarnings && warnings.length > 0) {
+                warningsDiv.style.display = 'block';
+                warningList.innerHTML = '';
+                
+                warnings.forEach(warning => {
+                    const item = document.createElement('div');
+                    item.className = 'ai-warning-item';
+                    item.innerHTML = `
+                        <span>${warning.road} - ${warning.type}</span>
+                        <span class="warning-badge">連續未中 ${warning.streak} 次</span>
+                    `;
+                    warningList.appendChild(item);
+                });
+            } else {
+                warningsDiv.style.display = 'none';
+            }
+        }
+
+        // 計算連續未中次數
+        function countMissStreak(results) {
+            if (!results || results.length === 0) return 0;
+            
+            let streak = 0;
+            for (let i = results.length - 1; i >= 0; i--) {
+                if (results[i] === false) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            return streak;
+        }
+
+        // 計算連對或連錯次數 (正數=連對, 負數=連錯)
+        function countStreak(results) {
+            if (!results || results.length === 0) return 0;
+            
+            let streak = 0;
+            const lastResult = results[results.length - 1];
+            
+            for (let i = results.length - 1; i >= 0; i--) {
+                if (results[i] === lastResult) {
+                    streak++;
+                } else {
+                    break;
+                }
+            }
+            
+            // 如果最後一個是 true (命中), 返回正數; 如果是 false (未中), 返回負數
+            return lastResult === true ? streak : -streak;
+        }
+
+        // 創建路單卡片
+        function createRoadCard(config) {
+            const card = document.createElement('div');
+            card.className = 'road-card';
+
+            // 分組珠子
+            const groups = [];
+            for (let i = 0; i <= sequence.length - config.size; i++) {
+                groups.push(sequence.slice(i, i + config.size));
+            }
+
+            // 計算統計 (傳入 config 用於跳投路特殊處理)
+            const stats = calculateStats(groups, config);
+
+            // 標題
+            const header = document.createElement('div');
+            header.className = 'road-header';
+            
+            header.innerHTML = `
+                <span class="road-name">${config.name}</span>
+            `;
+            card.appendChild(header);
+
+            // 珠盤路 - 根據路單類型使用不同顯示方式
+            if (config.isBigRoad) {
+                // 大路: 使用大路邏輯（支援龍尾），不顯示統計
+                card.appendChild(createBigRoadFromSequence(sequence, config.rows));
+                return card; // 大路不需要統計，直接返回
+            } else if (config.isThreeMoreRoad) {
+                // 三多打: 顯示原始sequence(和珠路一樣)
+                card.appendChild(createBeadRoadFromSequence(sequence, config.rows));
+            } else if (config.isSmilePath) {
+                // 微笑路: 使用大路邏輯
+                card.appendChild(createBigRoadFromSequence(sequence, config.rows));
+            } else {
+                // 其他路單: 正常順序顯示
+                card.appendChild(createBeadRoadFromSequence(sequence, config.rows));
+            }
+
+            // 統計 (含正反打格子) - 在珠盤路下方
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'road-stats';
+            
+            // 計算提示
+            const followLastPred = stats.followPred ? stats.followPred[stats.followPred.length - 1] : null;
+            const followTip = followLastPred === '停' ? '停' : (followLastPred === 'B' ? '莊' : (followLastPred === 'P' ? '閒' : '--'));
+            
+            const counterLastPred = stats.counterPred ? stats.counterPred[stats.counterPred.length - 1] : null;
+            const counterTip = counterLastPred === '停' ? '停' : (counterLastPred === 'B' ? '莊' : (counterLastPred === 'P' ? '閒' : '--'));
+            
+            // 計算正確/錯誤次數和勝率/負率
+            const followCorrect = stats.followHits;
+            const followWrong = stats.followTotal - stats.followHits;
+            const followWinRate = stats.followTotal > 0 ? ((stats.followHits / stats.followTotal) * 100).toFixed(0) : 0;
+            const followLoseRate = stats.followTotal > 0 ? ((followWrong / stats.followTotal) * 100).toFixed(0) : 0;
+            
+            const counterCorrect = stats.counterHits;
+            const counterWrong = stats.counterTotal - stats.counterHits;
+            const counterWinRate = stats.counterTotal > 0 ? ((stats.counterHits / stats.counterTotal) * 100).toFixed(0) : 0;
+            const counterLoseRate = stats.counterTotal > 0 ? ((counterWrong / stats.counterTotal) * 100).toFixed(0) : 0;
+            
+            // 根據路單類型決定標籤
+            let followLabel = '正打';
+            let counterLabel = '反打';
+            if (config.isBigRoad) {
+                followLabel = '打連';
+                counterLabel = '打跳';
+            } else if (config.isThreeMoreRoad) {
+                followLabel = '正打';
+                counterLabel = '反打';
+            } else if (config.isSmilePath) {
+                followLabel = '打連';
+                counterLabel = '打跳';
+            } else if (config.isJumpPath) {
+                followLabel = '莊閒';
+                counterLabel = '閒莊';
+            } else if (config.isXunZhenRoad) {
+                followLabel = '莊莊閒';
+                counterLabel = '閒閒莊';
+            } else if (config.isDuiGenRoad) {
+                followLabel = '閒莊莊';
+                counterLabel = '莊閒閒';
+            } else if (config.isLiKanRoad) {
+                followLabel = '莊閒莊';
+                counterLabel = '閒莊閒';
+            }
+            
+            // 正打格子 (大路/三多打/微笑路/跳投路有特殊標籤)
+            const followBox = document.createElement('div');
+            followBox.className = 'stat-box';
+            
+            // 標題和統計行
+            const followRow = document.createElement('div');
+            followRow.className = 'stat-box-row';
+            const followHeader = document.createElement('div');
+            followHeader.className = 'stat-header';
+            followHeader.textContent = `${followLabel} 【正確: ${followCorrect} 錯誤: ${followWrong}】`;
+            followRow.appendChild(followHeader);
+            
+            const followInfo = document.createElement('div');
+            followInfo.className = 'stat-info';
+            followInfo.innerHTML = `【勝率: ${followWinRate}% 負率: ${followLoseRate}%】提示: ${followTip}`;
+            followRow.appendChild(followInfo);
+            followBox.appendChild(followRow);
+            
+            // 珠子行
+            const followBeadsContainer = document.createElement('div');
+            followBeadsContainer.className = 'stat-beads-container';
+            followBeadsContainer.appendChild(createStatBeads(stats.followResults));
+            followBox.appendChild(followBeadsContainer);
+            
+            statsDiv.appendChild(followBox);
+
+            // 反打格子 (微笑路改為"打跳",跳投路改為"閒莊")
+            const counterBox = document.createElement('div');
+            counterBox.className = 'stat-box';
+            
+            // 標題和統計行
+            const counterRow = document.createElement('div');
+            counterRow.className = 'stat-box-row';
+            const counterHeader = document.createElement('div');
+            counterHeader.className = 'stat-header';
+            counterHeader.textContent = `${counterLabel} 【正確: ${counterCorrect} 錯誤: ${counterWrong}】`;
+            counterRow.appendChild(counterHeader);
+            
+            const counterInfo = document.createElement('div');
+            counterInfo.className = 'stat-info';
+            counterInfo.innerHTML = `【勝率: ${counterWinRate}% 負率: ${counterLoseRate}%】提示: ${counterTip}`;
+            counterRow.appendChild(counterInfo);
+            counterBox.appendChild(counterRow);
+            
+            // 珠子行
+            const counterBeadsContainer = document.createElement('div');
+            counterBeadsContainer.className = 'stat-beads-container';
+            counterBeadsContainer.appendChild(createStatBeads(stats.counterResults));
+            counterBox.appendChild(counterBeadsContainer);
+            
+            statsDiv.appendChild(counterBox);
+
+            card.appendChild(statsDiv);
+
+            return card;
+        }
+
+        // 創建珠盤路 (根據每種路單的行數不同)
+        function createBeadRoad(groups, rows, showEmpty = false) {
+            const container = document.createElement('div');
+            container.className = 'bead-road';
+
+            const cols = showEmpty ? 25 : Math.max(15, Math.ceil(groups.length / rows));
+            
+            const grid = document.createElement('div');
+            grid.className = 'bead-grid';
+            // 左側行號 + 頂部列號 + 數據格子
+            grid.style.gridTemplateColumns = `20px repeat(${cols}, 26px)`;
+            grid.style.gridTemplateRows = `20px repeat(${rows}, 26px)`;
+
+            // 左上角空格
+            const corner = document.createElement('div');
+            corner.className = 'bead-cell grid-number';
+            grid.appendChild(corner);
+
+            // 頂部列號
+            for (let col = 0; col < cols; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'bead-cell grid-number';
+                cell.textContent = col + 1;
+                grid.appendChild(cell);
+            }
+
+            // 每一行
+            for (let row = 0; row < rows; row++) {
+                // 左側行號
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'bead-cell row-number';
+                rowLabel.textContent = row + 1;
+                grid.appendChild(rowLabel);
+
+                // 珠子格子
+                for (let col = 0; col < cols; col++) {
+                    const index = col * rows + row;
+                    const cell = document.createElement('div');
+                    cell.className = 'bead-cell';
+                    
+                    if (index < groups.length && !showEmpty) {
+                        const group = groups[index];
+                        const lastResult = group[group.length - 1];
+                        const bead = document.createElement('div');
+                        bead.className = `bead bead-${lastResult}`;
+                        bead.title = group.join('');
+                        cell.appendChild(bead);
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+
+            container.appendChild(grid);
+            return container;
+        }
+
+        // 創建跳投路珠盤 (特殊邏輯:命中繼續往下,未中跳到下一列)
+        function createJumpPathRoad(seq, rows) {
+            const container = document.createElement('div');
+            container.className = 'bead-road';
+
+            if (seq.length === 0) {
+                return container;
+            }
+
+            // 計算珠子位置 (命中往下,未中跳列) - 使用莊閒模式(B→P輪流)
+            const positions = [];
+            let currentCol = 0;
+            let currentRow = 0;
+            let expecting = 'B'; // 開始預測莊
+
+            for (let i = 0; i < seq.length; i++) {
+                const current = seq[i];
+                positions.push({ col: currentCol, row: currentRow, result: current });
+
+                // 判斷是否命中
+                const isHit = (current === expecting);
+                
+                // 無論命中與否,都切換預測值 (一直輪流)
+                expecting = expecting === 'B' ? 'P' : 'B';
+                
+                // 計算下一顆位置
+                if (i < seq.length - 1) {
+                    if (isHit) {
+                        // 命中: 往下
+                        currentRow++;
+                        if (currentRow >= rows) {
+                            currentRow = 0;
+                            currentCol++;
+                        }
+                    } else {
+                        // 未中: 跳到下一列
+                        currentCol++;
+                        currentRow = 0;
+                    }
+                }
+            }
+
+            // 計算需要的列數
+            const maxCol = Math.max(...positions.map(p => p.col), 9); // 至少10列
+            const cols = maxCol + 1;
+
+            const grid = document.createElement('div');
+            grid.className = 'bead-grid';
+            grid.style.gridTemplateColumns = `20px repeat(${cols}, 26px)`;
+            grid.style.gridTemplateRows = `20px repeat(${rows}, 26px)`;
+
+            // 左上角空格
+            const corner = document.createElement('div');
+            corner.className = 'bead-cell grid-number';
+            grid.appendChild(corner);
+
+            // 頂部列號
+            for (let col = 0; col < cols; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'bead-cell grid-number';
+                cell.textContent = col + 1;
+                grid.appendChild(cell);
+            }
+
+            // 創建格子並填入珠子
+            for (let row = 0; row < rows; row++) {
+                // 左側行號
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'bead-cell row-number';
+                rowLabel.textContent = row + 1;
+                grid.appendChild(rowLabel);
+
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'bead-cell';
+                    
+                    // 找出這個位置的珠子
+                    const bead = positions.find(p => p.col === col && p.row === row);
+                    if (bead) {
+                        const beadEl = document.createElement('div');
+                        beadEl.className = `bead bead-${bead.result}`;
+                        cell.appendChild(beadEl);
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+
+            container.appendChild(grid);
+            return container;
+        }
+
+        // 創建珠盤路 (顯示原始序列 - 用於不完整的組)
+        function createBeadRoadFromSequence(seq, rows) {
+            const container = document.createElement('div');
+            container.className = 'bead-road';
+
+            const cols = Math.max(15, Math.ceil(seq.length / rows));
+            
+            // 計算最後一個有數據的列 (從0開始)
+            const lastDataCol = seq.length > 0 ? Math.ceil(seq.length / rows) - 1 : 0;
+            container.setAttribute('data-last-col', lastDataCol);
+            
+            const grid = document.createElement('div');
+            grid.className = 'bead-grid';
+            grid.style.gridTemplateColumns = `20px repeat(${cols}, 26px)`;
+            grid.style.gridTemplateRows = `20px repeat(${rows}, 26px)`;
+
+            // 左上角空格
+            const corner = document.createElement('div');
+            corner.className = 'bead-cell grid-number';
+            grid.appendChild(corner);
+
+            // 頂部列號
+            for (let col = 0; col < cols; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'bead-cell grid-number';
+                cell.textContent = col + 1;
+                grid.appendChild(cell);
+            }
+
+            // 每一行
+            for (let row = 0; row < rows; row++) {
+                // 左側行號
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'bead-cell row-number';
+                rowLabel.textContent = row + 1;
+                grid.appendChild(rowLabel);
+
+                // 珠子格子
+                for (let col = 0; col < cols; col++) {
+                    const index = col * rows + row;
+                    const cell = document.createElement('div');
+                    cell.className = 'bead-cell';
+                    
+                    if (index < seq.length) {
+                        const result = seq[index];
+                        const bead = document.createElement('div');
+                        bead.className = `bead bead-${result}`;
+                        cell.appendChild(bead);
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+
+            container.appendChild(grid);
+            return container;
+        }
+
+        // 創建大路邏輯的珠盤路 (相同結果往下,不同結果換列)
+        function createBigRoadFromSequence(seq, rows) {
+            const container = document.createElement('div');
+            container.className = 'bead-road';
+
+            if (seq.length === 0) {
+                const cols = 15;
+                const grid = document.createElement('div');
+                grid.className = 'bead-grid';
+                grid.style.gridTemplateColumns = `20px repeat(${cols}, 26px)`;
+                grid.style.gridTemplateRows = `20px repeat(${rows}, 26px)`;
+                container.appendChild(grid);
+                return container;
+            }
+
+            // 計算珠子位置 (大路邏輯: 相同往下,不同換列,支援龍尾)
+            const positions = [];
+            let currentCol = 0;
+            let currentRow = 0;
+            let startCol = 0;
+            let dragonRow = -1; // -1表示還沒進入龍尾模式
+            let prevResult = null;
+
+            // 檢查某個位置是否已被佔用
+            const isOccupied = (col, row) => {
+                return positions.some(p => p.col === col && p.row === row);
+            };
+
+            for (let i = 0; i < seq.length; i++) {
+                const current = seq[i];
+                
+                // 如果和前一個不同,換到下一列,重置龍尾狀態
+                if (prevResult !== null && prevResult !== current) {
+                    currentCol = startCol + 1;
+                    startCol = currentCol;
+                    currentRow = 0;
+                    dragonRow = -1;
+                }
+                
+                // 記錄當前位置
+                positions.push({ col: currentCol, row: currentRow, result: current });
+                
+                // 準備下一顆位置(如果下一顆和當前相同)
+                if (i < seq.length - 1 && seq[i + 1] === current) {
+                    if (dragonRow !== -1) {
+                        // 已經在龍尾模式: 只能往右
+                        currentCol++;
+                        currentRow = dragonRow;
+                        // 檢查並避開已佔用的位置
+                        while (isOccupied(currentCol, currentRow)) {
+                            currentCol++;
+                        }
+                    } else if (currentRow < rows - 1 && !isOccupied(currentCol, currentRow + 1)) {
+                        // 可以往下
+                        currentRow++;
+                    } else {
+                        // 進入龍尾模式
+                        dragonRow = currentRow;
+                        currentCol++;
+                        currentRow = dragonRow;
+                        // 檢查並避開已佔用的位置
+                        while (isOccupied(currentCol, currentRow)) {
+                            currentCol++;
+                        }
+                    }
+                }
+                
+                prevResult = current;
+            }
+
+            // 計算需要的列數
+            const maxCol = Math.max(...positions.map(p => p.col));
+            const cols = Math.max(15, maxCol + 2);
+            
+            // 記錄最後一個有數據的列
+            container.setAttribute('data-last-col', maxCol);
+
+            const grid = document.createElement('div');
+            grid.className = 'bead-grid';
+            grid.style.gridTemplateColumns = `20px repeat(${cols}, 26px)`;
+            grid.style.gridTemplateRows = `20px repeat(${rows}, 26px)`;
+
+            // 左上角空格
+            const corner = document.createElement('div');
+            corner.className = 'bead-cell grid-number';
+            grid.appendChild(corner);
+
+            // 頂部列號
+            for (let col = 0; col < cols; col++) {
+                const cell = document.createElement('div');
+                cell.className = 'bead-cell grid-number';
+                cell.textContent = col + 1;
+                grid.appendChild(cell);
+            }
+
+            // 創建位置映射
+            const posMap = new Map();
+            positions.forEach(p => {
+                const key = `${p.col},${p.row}`;
+                posMap.set(key, p.result);
+            });
+
+            // 每一行
+            for (let row = 0; row < rows; row++) {
+                // 左側行號
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'bead-cell row-number';
+                rowLabel.textContent = row + 1;
+                grid.appendChild(rowLabel);
+
+                // 珠子格子
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'bead-cell';
+                    
+                    const key = `${col},${row}`;
+                    if (posMap.has(key)) {
+                        const result = posMap.get(key);
+                        const bead = document.createElement('div');
+                        bead.className = `bead bead-${result}`;
+                        cell.appendChild(bead);
+                    }
+                    
+                    grid.appendChild(cell);
+                }
+            }
+
+            container.appendChild(grid);
+            return container;
+        }
+
+        // 計算統計
+        function calculateStats(groups, config) {
+            // 大路特殊處理: 預測下一顆，正打=跟上一顆相同，反打=跟上一顆相反
+            if (config && config.isBigRoad && sequence.length >= 1) {
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0, counterHits = 0;
+                const followResults = [], counterResults = [];
+                const followPred = [], counterPred = [];
+
+                // 從第2顆開始預測（第1顆用來觀察）
+                for (let i = 1; i < sequence.length; i++) {
+                    const prevResult = sequence[i - 1]; // 上一顆
+                    const currentResult = sequence[i]; // 當前這顆
+                    
+                    // 正打: 預測跟上一顆相同
+                    const followPrediction = prevResult;
+                    const followHit = followPrediction === currentResult;
+                    followResults.push(followHit);
+                    followPred.push(followPrediction);
+                    if (followHit) followHits++;
+                    
+                    // 反打: 預測跟上一顆相反
+                    const counterPrediction = prevResult === 'B' ? 'P' : 'B';
+                    const counterHit = counterPrediction === currentResult;
+                    counterResults.push(counterHit);
+                    counterPred.push(counterPrediction);
+                    if (counterHit) counterHits++;
+                }
+
+                const followTotal = followResults.length;
+                const counterTotal = counterResults.length;
+
+                // 下一顆的預測
+                if (sequence.length > 0) {
+                    const lastResult = sequence[sequence.length - 1];
+                    followPred.push(lastResult); // 正打: 跟上一顆相同
+                    counterPred.push(lastResult === 'B' ? 'P' : 'B'); // 反打: 跟上一顆相反
+                }
+
+                return {
+                    bankerCount,
+                    playerCount,
+                    followHits,
+                    counterHits,
+                    followTotal,
+                    counterTotal,
+                    followResults,
+                    counterResults,
+                    followPred,
+                    counterPred
+                };
+            }
+            
+            // 三多打特殊處理: 第1組觀察,第2組開始預測,命中停止
+            if (config && config.isThreeMoreRoad && sequence.length >= 1) {
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0, counterHits = 0;
+                const followResults = [], counterResults = [];
+                let followPred = ['停'], counterPred = ['停'];
+                let followStopped = false, counterStopped = false;
+
+                // 當前處理到第幾組(0-based)
+                const currentGroupIndex = Math.floor((sequence.length - 1) / 3);
+                const posInGroup = (sequence.length - 1) % 3; // 當前這顆在組內的位置(0,1,2)
+
+                // 處理每個完整的3顆組
+                let observeGroupResult = null; // 前一組的結果(莊多/閒多)
+                
+                for (let groupIdx = 0; groupIdx <= currentGroupIndex; groupIdx++) {
+                    const groupStart = groupIdx * 3;
+                    const groupEnd = Math.min(groupStart + 3, sequence.length);
+                    
+                    if (groupIdx === 0) {
+                        // 第1組: 觀察
+                        if (groupEnd - groupStart === 3) {
+                            // 第1組完整了,計算結果
+                            const group = sequence.slice(groupStart, groupEnd);
+                            const bankerInGroup = group.filter(s => s === 'B').length;
+                            observeGroupResult = bankerInGroup > 1 ? 'B' : 'P'; // 2或3個莊=莊多,否則閒多
+                        }
+                    } else {
+                        // 第2組以後: 預測
+                        if (observeGroupResult !== null) {
+                            // 只處理這組已開出的珠子
+                            for (let i = groupStart; i < groupEnd; i++) {
+                                const posInCurrentGroup = i - groupStart; // 0, 1, 或 2
+                                
+                                if (posInCurrentGroup === 0) {
+                                    // 這組的第1顆: 重置停止狀態
+                                    followStopped = false;
+                                    counterStopped = false;
+                                }
+                                
+                                const current = sequence[i];
+                                
+                                // 正打: 預測和前一組結果相同
+                                if (!followStopped) {
+                                    const followHit = (current === observeGroupResult);
+                                    followResults.push(followHit);
+                                    if (followHit) {
+                                        followHits++;
+                                        followStopped = true; // 命中後停止
+                                    }
+                                }
+                                
+                                // 反打: 預測和前一組結果相反
+                                if (!counterStopped) {
+                                    const counterHit = (current !== observeGroupResult);
+                                    counterResults.push(counterHit);
+                                    if (counterHit) {
+                                        counterHits++;
+                                        counterStopped = true;
+                                    }
+                                }
+                            }
+                            
+                            // 如果這組完整了,更新觀察組結果
+                            if (groupEnd - groupStart === 3) {
+                                const group = sequence.slice(groupStart, groupEnd);
+                                const bankerInGroup = group.filter(s => s === 'B').length;
+                                observeGroupResult = bankerInGroup > 1 ? 'B' : 'P';
+                            }
+                        }
+                    }
+                }
+
+                // 計算下一顆提示
+                if (observeGroupResult !== null) {
+                    const nextPos = sequence.length % 3; // 下一顆在組內的位置
+                    
+                    if (nextPos === 0) {
+                        // 下一顆是新組第1顆 → 根據前一組預測
+                        followPred = [observeGroupResult]; // 正打: 和前一組相同
+                        counterPred = [observeGroupResult === 'B' ? 'P' : 'B']; // 反打: 相反
+                    } else {
+                        // 下一顆是當前組的第2或第3顆
+                        if (followStopped) {
+                            followPred = ['停'];
+                        } else {
+                            followPred = [observeGroupResult];
+                        }
+                        
+                        if (counterStopped) {
+                            counterPred = ['停'];
+                        } else {
+                            counterPred = [observeGroupResult === 'B' ? 'P' : 'B'];
+                        }
+                    }
+                }
+
+                return {
+                    bankerRate: ((bankerCount / sequence.length) * 100).toFixed(0),
+                    playerRate: ((playerCount / sequence.length) * 100).toFixed(0),
+                    followHits,
+                    followTotal: followResults.length,
+                    counterHits,
+                    counterTotal: counterResults.length,
+                    followPred,
+                    counterPred,
+                    followResults,
+                    counterResults
+                };
+            }
+            
+            // 珠路特殊處理(二珠路~七珠路): 第1顆觀察,其餘預測,命中後停止
+            if (config && config.isPearlRoad && sequence.length >= 1) {
+                const groupSize = config.size; // 2, 3, 4, 5, 6, 或 7
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0, counterHits = 0;
+                const followResults = [], counterResults = [];
+                let followPred = ['停'], counterPred = ['停'];
+                let followStopped = false, counterStopped = false; // 記錄是否已命中停止
+
+                for (let i = 0; i < sequence.length; i++) {
+                    const posInGroup = i % groupSize; // 0=第1顆, 1=第2顆, 2=第3顆...
+                    
+                    if (posInGroup === 0) {
+                        // 第1顆: 觀察,不推珠子,重置停止狀態
+                        followStopped = false;
+                        counterStopped = false;
+                    } else {
+                        // 第2顆之後: 預測
+                        const groupStart = i - posInGroup;
+                        const observeBead = sequence[groupStart]; // 這組的第1顆
+                        const current = sequence[i];
+                        
+                        // 正打: 預測和第1顆相同
+                        if (!followStopped) {
+                            const followHit = (current === observeBead);
+                            followResults.push(followHit);
+                            if (followHit) {
+                                followHits++;
+                                followStopped = true; // 命中後停止
+                            }
+                        }
+                        
+                        // 反打: 預測和第1顆相反
+                        if (!counterStopped) {
+                            const counterHit = (current !== observeBead);
+                            counterResults.push(counterHit);
+                            if (counterHit) {
+                                counterHits++;
+                                counterStopped = true; // 命中後停止
+                            }
+                        }
+                    }
+                }
+
+                // 計算下一顆提示
+                const currentPos = (sequence.length - 1) % groupSize; // 當前這顆在組內的位置
+                const nextPos = sequence.length % groupSize; // 下一顆在組內的位置
+                
+                // 正打提示
+                if (nextPos === 0) {
+                    // 剛開完最後一顆,下一顆是新組第1顆(觀察) → 提示"停"
+                    followPred = ['停'];
+                } else if (nextPos === 1) {
+                    // 剛開完第1顆(觀察),下一顆是第2顆 → 提示預測(和第1顆相同)
+                    const groupStart = sequence.length - 1; // 第1顆的位置就是當前-1
+                    const observeBead = sequence[groupStart];
+                    followPred = [observeBead];
+                } else {
+                    // 剛開完第2顆或之後,下一顆是第3顆或之後
+                    if (followStopped) {
+                        // 已命中 → 提示"停"
+                        followPred = ['停'];
+                    } else {
+                        // 未中 → 繼續提示預測
+                        const groupStart = sequence.length - nextPos; // 第1顆的位置
+                        const observeBead = sequence[groupStart];
+                        followPred = [observeBead];
+                    }
+                }
+                
+                // 反打提示
+                if (nextPos === 0) {
+                    // 剛開完最後一顆,下一顆是新組第1顆(觀察) → 提示"停"
+                    counterPred = ['停'];
+                } else if (nextPos === 1) {
+                    // 剛開完第1顆(觀察),下一顆是第2顆 → 提示預測(和第1顆相反)
+                    const groupStart = sequence.length - 1;
+                    const observeBead = sequence[groupStart];
+                    counterPred = [observeBead === 'B' ? 'P' : 'B'];
+                } else {
+                    // 剛開完第2顆或之後,下一顆是第3顆或之後
+                    if (counterStopped) {
+                        // 已命中 → 提示"停"
+                        counterPred = ['停'];
+                    } else {
+                        // 未中 → 繼續提示預測
+                        const groupStart = sequence.length - nextPos;
+                        const observeBead = sequence[groupStart];
+                        counterPred = [observeBead === 'B' ? 'P' : 'B'];
+                    }
+                }
+
+                return {
+                    bankerRate: ((bankerCount / sequence.length) * 100).toFixed(0),
+                    playerRate: ((playerCount / sequence.length) * 100).toFixed(0),
+                    followHits,
+                    followTotal: followResults.length,
+                    counterHits,
+                    counterTotal: counterResults.length,
+                    followPred,
+                    counterPred,
+                    followResults,
+                    counterResults
+                };
+            }
+            
+            // 微笑路特殊處理: 看連和跳,每一顆和前一顆比較
+            if (config && config.isSmilePath && sequence.length >= 1) {
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0;
+                let counterHits = 0;
+                const followResults = [];
+                const counterResults = [];
+
+                // 從第2顆開始,和前一顆比較
+                for (let i = 1; i < sequence.length; i++) {
+                    const prev = sequence[i - 1];
+                    const current = sequence[i];
+                    
+                    // 打連: 預測和前一顆相同
+                    const followHit = (prev === current);
+                    followResults.push(followHit);
+                    if (followHit) followHits++;
+                    
+                    // 打跳: 預測和前一顆不同
+                    const counterHit = (prev !== current);
+                    counterResults.push(counterHit);
+                    if (counterHit) counterHits++;
+                }
+
+                // 計算下一顆提示
+                const last = sequence[sequence.length - 1];
+                const followPred = [last]; // 打連: 預測和當前相同
+                const counterPred = [last === 'B' ? 'P' : 'B']; // 打跳: 預測和當前相反
+
+                return {
+                    bankerRate: ((bankerCount / sequence.length) * 100).toFixed(0),
+                    playerRate: ((playerCount / sequence.length) * 100).toFixed(0),
+                    followHits,
+                    followTotal: followResults.length,
+                    counterHits,
+                    counterTotal: counterResults.length,
+                    followPred,
+                    counterPred,
+                    followResults,
+                    counterResults
+                };
+            }
+            
+            // 巽震路/兌艮路/離坎路特殊處理: 循環預測模式,每一顆都判斷
+            if (config && (config.isXunZhenRoad || config.isDuiGenRoad || config.isLiKanRoad) && sequence.length >= 1) {
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0;
+                let counterHits = 0;
+                const followResults = [];
+                const counterResults = [];
+
+                const pattern1 = config.patterns[0]; // 正打模式 (例如: 'BBP')
+                const pattern2 = config.patterns[1]; // 反打模式 (例如: 'PPB')
+
+                // 正打模式: 一直循環預測 pattern1 (例如 BBP BBP BBP...)
+                let followExpecting = pattern1[0]; // 開始預測模式的第1個字符
+                let followPos = 0; // 當前在模式中的位置
+                for (let i = 0; i < sequence.length; i++) {
+                    const current = sequence[i];
+                    const isHit = (current === followExpecting);
+                    followResults.push(isHit);
+                    if (isHit) followHits++;
+                    
+                    // 無論命中與否,都移到模式的下一個位置
+                    followPos = (followPos + 1) % 3;
+                    followExpecting = pattern1[followPos];
+                }
+
+                // 反打模式: 一直循環預測 pattern2 (例如 PPB PPB PPB...)
+                let counterExpecting = pattern2[0]; // 開始預測模式的第1個字符
+                let counterPos = 0; // 當前在模式中的位置
+                for (let i = 0; i < sequence.length; i++) {
+                    const current = sequence[i];
+                    const isHit = (current === counterExpecting);
+                    counterResults.push(isHit);
+                    if (isHit) counterHits++;
+                    
+                    // 無論命中與否,都移到模式的下一個位置
+                    counterPos = (counterPos + 1) % 3;
+                    counterExpecting = pattern2[counterPos];
+                }
+
+                // 下一顆的預測 (已經在循環中更新了)
+                const followPred = [followExpecting];
+                const counterPred = [counterExpecting];
+
+                return {
+                    bankerRate: ((bankerCount / sequence.length) * 100).toFixed(0),
+                    playerRate: ((playerCount / sequence.length) * 100).toFixed(0),
+                    followHits,
+                    followTotal: followResults.length,
+                    counterHits,
+                    counterTotal: counterResults.length,
+                    followPred,
+                    counterPred,
+                    followResults,
+                    counterResults
+                };
+            }
+            
+            // 跳投路特殊處理: 每一顆都判斷莊閒/閒莊模式
+            if (config && config.isJumpPath && sequence.length >= 1) {
+                const bankerCount = sequence.filter(s => s === 'B').length;
+                const playerCount = sequence.length - bankerCount;
+
+                let followHits = 0;
+                let counterHits = 0;
+                const followResults = [];
+                const counterResults = [];
+
+                // 莊閒模式: 一直預測 B→P→B→P 循環 (不管中或不中都輪流)
+                let followExpecting = 'B'; // 開始預測莊
+                for (let i = 0; i < sequence.length; i++) {
+                    const current = sequence[i];
+                    const isHit = (current === followExpecting);
+                    followResults.push(isHit);
+                    if (isHit) followHits++;
+                    
+                    // 無論命中與否,都切換到下一個預測值
+                    followExpecting = followExpecting === 'B' ? 'P' : 'B';
+                }
+
+                // 閒莊模式: 一直預測 P→B→P→B 循環 (不管中或不中都輪流)
+                let counterExpecting = 'P'; // 開始預測閒
+                for (let i = 0; i < sequence.length; i++) {
+                    const current = sequence[i];
+                    const isHit = (current === counterExpecting);
+                    counterResults.push(isHit);
+                    if (isHit) counterHits++;
+                    
+                    // 無論命中與否,都切換到下一個預測值
+                    counterExpecting = counterExpecting === 'P' ? 'B' : 'P';
+                }
+
+                const followPred = [followExpecting]; // 莊閒下一個預測
+                const counterPred = [counterExpecting]; // 閒莊下一個預測
+
+                return {
+                    bankerRate: ((bankerCount / sequence.length) * 100).toFixed(0),
+                    playerRate: ((playerCount / sequence.length) * 100).toFixed(0),
+                    followHits,
+                    followTotal: followResults.length,
+                    counterHits,
+                    counterTotal: counterResults.length,
+                    followPred,
+                    counterPred,
+                    followResults,
+                    counterResults
+                };
+            }
+
+            // 一般路單需要至少2組
+            if (groups.length < 2) {
+                return {
+                    bankerRate: 0,
+                    playerRate: 0,
+                    followHits: 0,
+                    followTotal: 0,
+                    counterHits: 0,
+                    counterTotal: 0,
+                    followPred: null,
+                    counterPred: null,
+                    followResults: [],
+                    counterResults: []
+                };
+            }
+
+            const bankerCount = groups.filter(g => g[g.length - 1] === 'B').length;
+            const playerCount = groups.length - bankerCount;
+
+            let followHits = 0;
+            let counterHits = 0;
+            const followResults = [];
+            const counterResults = [];
+
+            // 跳投路使用特殊計算邏輯
+            if (config && config.isJumpPath) {
+                // 跳投路: 莊閒 = BP, 閒莊 = PB
+                for (let i = 0; i < groups.length - 1; i++) {
+                    const current = groups[i][groups[i].length - 1];
+                    const next = groups[i + 1][groups[i + 1].length - 1];
+                    
+                    // 莊閒: 預測 BP (莊後面接閒)
+                    const followHit = (current === 'B' && next === 'P');
+                    if (followHit) followHits++;
+                    followResults.push(followHit);
+                    
+                    // 閒莊: 預測 PB (閒後面接莊)
+                    const counterHit = (current === 'P' && next === 'B');
+                    if (counterHit) counterHits++;
+                    counterResults.push(counterHit);
+                }
+            } else {
+                // 一般路單: 正打反打邏輯
+                for (let i = 0; i < groups.length - 1; i++) {
+                    const current = groups[i][groups[i].length - 1];
+                    const next = groups[i + 1][groups[i + 1].length - 1];
+                    
+                    // 正打: 預測跟當前相同
+                    const followHit = (current === next);
+                    if (followHit) followHits++;
+                    followResults.push(followHit);
+                    
+                    // 反打: 預測跟當前相反
+                    const counterHit = (current !== next);
+                    if (counterHit) counterHits++;
+                    counterResults.push(counterHit);
+                }
+            }
+
+            const last = groups[groups.length - 1];
+            const lastResult = last[last.length - 1];
+            const followPred = [...last.slice(1), lastResult];
+            const counterPred = [...last.slice(1), lastResult === 'B' ? 'P' : 'B'];
+
+            return {
+                bankerRate: ((bankerCount / groups.length) * 100).toFixed(0),
+                playerRate: ((playerCount / groups.length) * 100).toFixed(0),
+                followHits,
+                followTotal: groups.length - 1,
+                counterHits,
+                counterTotal: groups.length - 1,
+                followPred,
+                counterPred,
+                followResults,
+                counterResults
+            };
+        }
+
+        // 創建空的珠子格子 (6行10列,左側有行號1-6)
+        function createEmptyStatBeads() {
+            const container = document.createElement('div');
+            const rows = 6;
+            const cols = 10;
+            
+            const grid = document.createElement('div');
+            grid.className = 'stat-beads-grid';
+            grid.style.gridTemplateColumns = `18px repeat(${cols}, 24px)`;
+            grid.style.gridTemplateRows = `repeat(${rows}, 24px)`;
+
+            for (let row = 0; row < rows; row++) {
+                // 左側行號
+                const rowLabel = document.createElement('div');
+                rowLabel.className = 'stat-bead-cell stat-row-number';
+                rowLabel.textContent = row + 1;
+                grid.appendChild(rowLabel);
+
+                // 空格子
+                for (let col = 0; col < cols; col++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'stat-bead-cell';
+                    grid.appendChild(cell);
+                }
+            }
+
+            container.appendChild(grid);
+            return container;
+        }
+
+        // 創建統計行的珠子格子 (6行N列,左側有行號1-6)
+        function createStatBeads(results, useRoadLogic = false) {
+            const container = document.createElement('div');
+            
+            if (results.length === 0) {
+                return createEmptyStatBeads();
+            }
+
+            const rows = 6; // 固定6行
+            
+            // 所有路單都使用大路邏輯顯示
+            if (true) {
+                // 跳投路特殊邏輯: 按照百家樂大路方式顯示
+                const positions = [];
+                let currentCol = 0;
+                let currentRow = 0;
+                let startCol = 0; // 記錄當前路的起始列
+                let dragonRow = -1; // 記錄龍尾延伸的固定行數
+                let prevHit = null;
+                
+                // 輔助函數: 檢查某個位置是否已被佔用
+                const isOccupied = (col, row) => {
+                    return positions.some(p => p.col === col && p.row === row);
+                };
+                
+                for (let i = 0; i < results.length; i++) {
+                    const isHit = results[i];
+                    
+                    // 如果狀態改變,跳到起始列的下一列
+                    if (prevHit !== null && prevHit !== isHit) {
+                        currentCol = startCol + 1;
+                        startCol = currentCol;
+                        currentRow = 0;
+                        dragonRow = -1; // 重置龍尾行
+                    }
+                    
+                    // 記錄當前珠子位置
+                    positions.push({ col: currentCol, row: currentRow, isHit });
+                    
+                    // 計算下一顆位置(如果不是最後一顆且狀態相同)
+                    if (i < results.length - 1) {
+                        const nextIsHit = results[i + 1];
+                        if (nextIsHit === isHit) {
+                            // 如果已經在龍尾模式,繼續在龍尾行向右
+                            if (dragonRow !== -1) {
+                                currentCol++;
+                                currentRow = dragonRow;
+                                // 如果被佔用繼續向右
+                                while (isOccupied(currentCol, currentRow)) {
+                                    currentCol++;
+                                }
+                            }
+                            // 如果還沒進入龍尾模式
+                            else if (currentRow < rows - 1 && !isOccupied(currentCol, currentRow + 1)) {
+                                // 還沒到底部且下一行沒被佔用:往下
+                                currentRow++;
+                            } else {
+                                // 到達底部或下一行被佔用:進入龍尾模式
+                                dragonRow = currentRow;
+                                
+                                // 向右並在龍尾行延伸
+                                currentCol++;
+                                currentRow = dragonRow;
+                                
+                                // 如果該位置被佔用,繼續向右(保持同一行)
+                                while (isOccupied(currentCol, currentRow)) {
+                                    currentCol++;
+                                }
+                            }
+                        }
+                    }
+                    
+                    prevHit = isHit;
+                }
+                
+                // 計算需要的列數
+                const maxCol = Math.max(...positions.map(p => p.col));
+                const cols = Math.max(maxCol + 1, 10); // 至少10列
+                
+                const grid = document.createElement('div');
+                grid.className = 'stat-beads-grid';
+                grid.style.gridTemplateColumns = `18px repeat(${cols}, 24px)`;
+                grid.style.gridTemplateRows = `repeat(${rows}, 24px)`;
+                
+                // 6行
+                for (let row = 0; row < rows; row++) {
+                    // 左側行號
+                    const rowLabel = document.createElement('div');
+                    rowLabel.className = 'stat-bead-cell stat-row-number';
+                    rowLabel.textContent = row + 1;
+                    grid.appendChild(rowLabel);
+                    
+                    // 珠子格子
+                    for (let col = 0; col < cols; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'stat-bead-cell';
+                        
+                        const pos = positions.find(p => p.col === col && p.row === row);
+                        if (pos) {
+                            const bead = document.createElement('div');
+                            bead.className = pos.isHit ? 'stat-bead stat-bead-hit' : 'stat-bead stat-bead-miss';
+                            bead.title = pos.isHit ? '命中' : '未中';
+                            cell.appendChild(bead);
+                        }
+                        
+                        grid.appendChild(cell);
+                    }
+                }
+                
+                container.appendChild(grid);
+                return container;
+            }
+        }
+
+        // 初始化
+        window.addEventListener('DOMContentLoaded', async function() {
+            await checkLoginStatus();
+            initializeEmptyRoads(); // 初始化顯示所有空路單
+            
+            // 從 localStorage 讀取並設定 AI局數
+            const savedAiStartRound = localStorage.getItem('aiStartRound');
+            if (savedAiStartRound !== null) {
+                document.getElementById('aiStartRound').value = savedAiStartRound;
+                console.log('已載入儲存的 AI局數:', savedAiStartRound);
+            }
+            
+            // 從 localStorage 讀取並設定連跳比率
+            const savedJumpRatioThreshold = localStorage.getItem('jumpRatioThreshold');
+            if (savedJumpRatioThreshold !== null) {
+                document.getElementById('jumpRatioThreshold').value = savedJumpRatioThreshold;
+                console.log('已載入儲存的連跳比率:', savedJumpRatioThreshold);
+            }
+            
+            // 監聽AI局數輸入框的變化,當值改變時重新計算
+            const aiStartRoundInput = document.getElementById('aiStartRound');
+            if (aiStartRoundInput) {
+                let debounceTimer;
+                let lastValue = aiStartRoundInput.value; // 記錄上次的值
+                
+                // 使用 input 事件立即響應,並添加防抖
+                aiStartRoundInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        // 檢查是否為空白,如果是則返回預設值 12
+                        if (aiStartRoundInput.value === '' || aiStartRoundInput.value === null) {
+                            aiStartRoundInput.value = '12';
+                            localStorage.setItem('aiStartRound', '12');
+                            console.log('AI局數為空白,已恢復預設值: 12');
+                        }
+                        // 只有值真的改變了才處理
+                        if (aiStartRoundInput.value !== lastValue) {
+                            lastValue = aiStartRoundInput.value;
+                            // 儲存到 localStorage
+                            localStorage.setItem('aiStartRound', aiStartRoundInput.value);
+                            console.log('AI局數已變更為:', aiStartRoundInput.value, '→ 已儲存,不清除AI記錄,只重新計算正確率');
+                            if (sequence.length > 0) {
+                                analyzeAll();
+                            }
+                        }
+                    }, 300); // 300ms 防抖延遲
+                });
+                
+                // 同時保留 change 事件,確保失去焦點時也會更新
+                aiStartRoundInput.addEventListener('change', function() {
+                    clearTimeout(debounceTimer);
+                    // 檢查是否為空白,如果是則返回預設值 12
+                    if (aiStartRoundInput.value === '' || aiStartRoundInput.value === null) {
+                        aiStartRoundInput.value = '12';
+                        localStorage.setItem('aiStartRound', '12');
+                        console.log('AI局數為空白,已恢復預設值: 12 (blur事件)');
+                    }
+                    if (aiStartRoundInput.value !== lastValue) {
+                        lastValue = aiStartRoundInput.value;
+                        // 儲存到 localStorage
+                        localStorage.setItem('aiStartRound', aiStartRoundInput.value);
+                        console.log('AI局數已變更為:', aiStartRoundInput.value, '(blur事件) → 已儲存,不清除AI記錄,只重新計算正確率');
+                        if (sequence.length > 0) {
+                            analyzeAll();
+                        }
+                    }
+                });
+            }
+
+            // 監聽連跳比率輸入框的變化,當值改變時重新計算
+            const jumpRatioInput = document.getElementById('jumpRatioThreshold');
+            if (jumpRatioInput) {
+                jumpRatioInput.addEventListener('input', function() {
+                    // 檢查是否為空白,如果是則返回預設值 0.26
+                    if (jumpRatioInput.value === '' || jumpRatioInput.value === null) {
+                        jumpRatioInput.value = '0.26';
+                        localStorage.setItem('jumpRatioThreshold', '0.26');
+                        console.log('連跳比率為空白,已恢復預設值: 0.26');
+                    } else {
+                        // 儲存到 localStorage
+                        localStorage.setItem('jumpRatioThreshold', jumpRatioInput.value);
+                        console.log('連跳比率閾值已變更為:', jumpRatioInput.value, '→ 已儲存');
+                    }
+                    if (sequence.length > 0) {
+                        analyzeAll(); // 重新計算以更新跳旺/連旺判斷
+                    }
+                });
+                
+                jumpRatioInput.addEventListener('change', function() {
+                    // 檢查是否為空白,如果是則返回預設值 0.26
+                    if (jumpRatioInput.value === '' || jumpRatioInput.value === null) {
+                        jumpRatioInput.value = '0.26';
+                        localStorage.setItem('jumpRatioThreshold', '0.26');
+                        console.log('連跳比率為空白,已恢復預設值: 0.26 (blur事件)');
+                    } else {
+                        // 儲存到 localStorage
+                        localStorage.setItem('jumpRatioThreshold', jumpRatioInput.value);
+                        console.log('連跳比率閾值確認為:', jumpRatioInput.value, '→ 已儲存');
+                    }
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定長龍閾值
+            const savedLongDragonThreshold = localStorage.getItem('longDragonThreshold');
+            if (savedLongDragonThreshold !== null) {
+                document.getElementById('longDragonThreshold').value = savedLongDragonThreshold;
+                console.log('已載入儲存的長龍閾值:', savedLongDragonThreshold);
+            }
+            
+            // 監聽長龍閾值變化
+            const longDragonInput = document.getElementById('longDragonThreshold');
+            if (longDragonInput) {
+                longDragonInput.addEventListener('change', function() {
+                    if (longDragonInput.value === '' || longDragonInput.value === null) {
+                        longDragonInput.value = '5';
+                    }
+                    // 允許設定為 0（表示停用功能）
+                    const value = parseInt(longDragonInput.value);
+                    if (value < 0) {
+                        longDragonInput.value = '0';
+                    }
+                    localStorage.setItem('longDragonThreshold', longDragonInput.value);
+                    console.log('長龍閾值已變更為:', longDragonInput.value, value === 0 ? '(已停用)' : '', '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定跳閾值
+            const savedJumpPatternThreshold = localStorage.getItem('jumpPatternThreshold');
+            if (savedJumpPatternThreshold !== null) {
+                document.getElementById('jumpPatternThreshold').value = savedJumpPatternThreshold;
+                console.log('已載入儲存的跳閾值:', savedJumpPatternThreshold);
+            }
+            
+            // 監聽跳閾值變化
+            const jumpPatternInput = document.getElementById('jumpPatternThreshold');
+            if (jumpPatternInput) {
+                jumpPatternInput.addEventListener('change', function() {
+                    if (jumpPatternInput.value === '' || jumpPatternInput.value === null) {
+                        jumpPatternInput.value = '2';
+                    }
+                    // 允許設定為 0（表示停用功能）
+                    const value = parseInt(jumpPatternInput.value);
+                    if (value < 0) {
+                        jumpPatternInput.value = '0';
+                    }
+                    localStorage.setItem('jumpPatternThreshold', jumpPatternInput.value);
+                    console.log('跳閾值已變更為:', jumpPatternInput.value, value === 0 ? '(已停用)' : '', '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定 AI 計算模式
+            const savedAiMode = localStorage.getItem('aiMode');
+            if (savedAiMode === 'winRate') {
+                document.getElementById('aiModeWinRate').checked = true;
+                console.log('已載入儲存的 AI 模式: 勝率莊閒');
+            } else {
+                document.getElementById('aiModeVoteCount').checked = true;
+                console.log('已載入儲存的 AI 模式: 總數莊閒');
+            }
+            
+            // 從 localStorage 讀取並設定勝率閾值
+            const savedWinRateThreshold = localStorage.getItem('winRateThreshold');
+            if (savedWinRateThreshold !== null) {
+                document.getElementById('winRateThreshold').value = savedWinRateThreshold;
+                console.log('已載入儲存的勝率閾值:', savedWinRateThreshold + '%');
+            }
+            
+            // 監聽勝率閾值變化
+            const winRateThresholdInput = document.getElementById('winRateThreshold');
+            if (winRateThresholdInput) {
+                winRateThresholdInput.addEventListener('change', function() {
+                    let value = parseFloat(this.value);
+                    if (isNaN(value) || value < 0) {
+                        value = 0;
+                        this.value = 0;
+                    } else if (value > 100) {
+                        value = 100;
+                        this.value = 100;
+                    }
+                    localStorage.setItem('winRateThreshold', value);
+                    console.log('勝率閾值已變更為:', value + '% → 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 監聽 AI 模式變化
+            const aiModeVoteCount = document.getElementById('aiModeVoteCount');
+            const aiModeWinRate = document.getElementById('aiModeWinRate');
+            
+            if (aiModeVoteCount) {
+                aiModeVoteCount.addEventListener('change', function() {
+                    if (this.checked) {
+                        localStorage.setItem('aiMode', 'voteCount');
+                        console.log('AI 模式已切換為: 總數莊閒 → 已儲存');
+                        if (sequence.length > 0) {
+                            analyzeAll();
+                        }
+                    }
+                });
+            }
+            
+            if (aiModeWinRate) {
+                aiModeWinRate.addEventListener('change', function() {
+                    if (this.checked) {
+                        localStorage.setItem('aiMode', 'winRate');
+                        console.log('AI 模式已切換為: 勝率莊閒 → 已儲存');
+                        if (sequence.length > 0) {
+                            analyzeAll();
+                        }
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定警示開關
+            const savedEnableWarnings = localStorage.getItem('enableWarnings');
+            const enableWarningsCheckbox = document.getElementById('enableWarnings');
+            if (enableWarningsCheckbox) {
+                if (savedEnableWarnings !== null) {
+                    enableWarningsCheckbox.checked = savedEnableWarnings === 'true';
+                    console.log('已載入儲存的警示設定:', savedEnableWarnings);
+                }
+                
+                // 監聽警示開關的變化
+                enableWarningsCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('enableWarnings', enableWarningsCheckbox.checked);
+                    console.log('警示功能已', enableWarningsCheckbox.checked ? '啟用' : '關閉', '→ 已儲存');
+                    
+                    // 重新分析以更新警示顯示
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定 AI統計顯示開關
+            const savedShowAiStreakCount = localStorage.getItem('showAiStreakCount');
+            const showAiStreakCountCheckbox = document.getElementById('showAiStreakCount');
+            const aiStreakCountItem = document.getElementById('aiStreakCountItem');
+            
+            if (showAiStreakCountCheckbox) {
+                if (savedShowAiStreakCount !== null) {
+                    showAiStreakCountCheckbox.checked = savedShowAiStreakCount === 'true';
+                    console.log('已載入儲存的 AI統計顯示設定:', savedShowAiStreakCount);
+                }
+                
+                // 設定初始顯示狀態
+                if (aiStreakCountItem) {
+                    aiStreakCountItem.style.display = showAiStreakCountCheckbox.checked ? 'flex' : 'none';
+                }
+                
+                // 監聽 AI統計顯示開關的變化
+                showAiStreakCountCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('showAiStreakCount', showAiStreakCountCheckbox.checked);
+                    console.log('AI統計顯示已', showAiStreakCountCheckbox.checked ? '啟用' : '關閉', '→ 已儲存');
+                    
+                    // 更新顯示狀態
+                    if (aiStreakCountItem) {
+                        aiStreakCountItem.style.display = showAiStreakCountCheckbox.checked ? 'flex' : 'none';
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定跳連比率顯示開關
+            const savedShowJumpRatio = localStorage.getItem('showJumpRatio');
+            const showJumpRatioCheckbox = document.getElementById('showJumpRatio');
+            const jumpRatioItem = document.getElementById('jumpRatioItem');
+            
+            if (showJumpRatioCheckbox) {
+                if (savedShowJumpRatio !== null) {
+                    showJumpRatioCheckbox.checked = savedShowJumpRatio === 'true';
+                    console.log('已載入儲存的跳連比率顯示設定:', savedShowJumpRatio);
+                }
+                
+                // 設定初始顯示狀態
+                if (jumpRatioItem) {
+                    jumpRatioItem.style.display = showJumpRatioCheckbox.checked ? 'flex' : 'none';
+                }
+                
+                // 監聽跳連比率顯示開關的變化
+                showJumpRatioCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('showJumpRatio', showJumpRatioCheckbox.checked);
+                    console.log('跳連比率顯示已', showJumpRatioCheckbox.checked ? '啟用' : '關閉', '→ 已儲存');
+                    
+                    // 更新顯示狀態
+                    if (jumpRatioItem) {
+                        jumpRatioItem.style.display = showJumpRatioCheckbox.checked ? 'flex' : 'none';
+                    }
+                });
+            }
+        });
+
+        // ============ 曲線圖功能 ============
+        let chartInstance = null;
+
+        // 四捨五入到指定小數位
+        function roundToDecimal(value, decimals) {
+            return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+        }
+
+        // 計算跳連比率
+        function calculateJumpRatio(results, index) {
+            if (index === 0) return 0;
+            
+            const groups = [];
+            let currentGroup = { value: results[0], count: 1 };
+            
+            for (let i = 1; i <= index; i++) {
+                if (results[i] === currentGroup.value) {
+                    currentGroup.count++;
+                } else {
+                    groups.push(currentGroup);
+                    currentGroup = { value: results[i], count: 1 };
+                }
+            }
+            groups.push(currentGroup);
+            
+            let singleJumps = 0;
+            for (const group of groups) {
+                if (group.count === 1) {
+                    singleJumps++;
+                }
+            }
+            
+            const total = index + 1;
+            return total > 0 ? roundToDecimal(singleJumps / total, 2) : 0;
+        }
+
+        // 計算累積勝率
+        function calculateWinRates(results) {
+            let bankerCount = 0;
+            let playerCount = 0;
+            const data = [];
+
+            for (let i = 0; i < results.length; i++) {
+                const result = results[i];
+                
+                if (result === 'B') {
+                    bankerCount++;
+                } else if (result === 'P') {
+                    playerCount++;
+                }
+
+                const total = bankerCount + playerCount;
+                const bankerWinRate = total > 0 ? roundToDecimal(bankerCount / total, 2) : 0;
+                const playerWinRate = total > 0 ? roundToDecimal(playerCount / total, 2) : 0;
+                const jumpRatio = calculateJumpRatio(results, i);
+
+                data.push({
+                    index: i,
+                    result: result,
+                    bankerCount: bankerCount,
+                    playerCount: playerCount,
+                    total: total,
+                    bankerWinRate: bankerWinRate,
+                    playerWinRate: playerWinRate,
+                    jumpRatio: jumpRatio
+                });
+            }
+
+            return data;
+        }
+
+        // 打開曲線圖模態視窗
+        function openChartModal() {
+            const modal = document.getElementById('chartModal');
+            modal.style.display = 'block';
+            
+            // 繪製圖表（即使沒有數據也可以打開）
+            if (sequence.length > 0) {
+                drawChartInModal();
+            } else {
+                // 清空圖表和數據表
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
+                }
+                document.getElementById('chartDataTableBody').innerHTML = '<tr><td colspan="8" style="padding: 20px; color: #999;">尚無數據</td></tr>';
+            }
+        }
+
+        // 關閉曲線圖模態視窗
+        function closeChartModal() {
+            const modal = document.getElementById('chartModal');
+            modal.style.display = 'none';
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        }
+
+        // 填充數據表
+        function fillDataTable(data) {
+            const tbody = document.getElementById('chartDataTableBody');
+            tbody.innerHTML = '';
+
+            data.forEach(d => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${d.index + 1}</td>
+                    <td><strong class="${d.result === 'B' ? 'result-b' : 'result-p'}">${d.result}</strong></td>
+                    <td>${d.bankerCount}</td>
+                    <td>${d.playerCount}</td>
+                    <td>${d.total}</td>
+                    <td><strong>${d.bankerWinRate.toFixed(2)}</strong></td>
+                    <td><strong>${d.playerWinRate.toFixed(2)}</strong></td>
+                    <td><strong>${d.jumpRatio.toFixed(2)}</strong></td>
+                `;
+            });
+        }
+
+        // 在模態視窗中繪製圖表
+        function drawChartInModal() {
+            const data = calculateWinRates(sequence);
+            const ctx = document.getElementById('chartCanvas');
+            
+            // 填充數據表
+            fillDataTable(data);
+            
+            const showBanker = document.getElementById('chartShowBanker').checked;
+            const showPlayer = document.getElementById('chartShowPlayer').checked;
+            const showPlayerIndex = document.getElementById('chartShowPlayerIndex').checked;
+            const showJumpRatio = document.getElementById('chartShowJumpRatio').checked;
+            const showValues = document.getElementById('chartShowValues').checked;
+            const showPoints = document.getElementById('chartShowPoints').checked;
+            const showGrid = document.getElementById('chartShowGrid').checked;
+
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+
+            const datasets = [];
+            const pointRadius = showPoints ? 3 : 0;
+
+            if (showBanker) {
+                datasets.push({
+                    label: '莊比率',
+                    data: data.map(d => ({ x: d.index + 1, y: d.bankerWinRate })),
+                    borderColor: 'rgb(255, 0, 0)',
+                    backgroundColor: 'rgba(255, 0, 0, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: pointRadius,
+                    pointHoverRadius: 5,
+                    tension: 0.1
+                });
+            }
+
+            if (showPlayer) {
+                datasets.push({
+                    label: '閒比率',
+                    data: data.map(d => ({ x: d.index + 1, y: d.playerWinRate })),
+                    borderColor: 'rgb(0, 102, 255)',
+                    backgroundColor: 'rgba(0, 102, 255, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: pointRadius,
+                    pointHoverRadius: 5,
+                    tension: 0.1
+                });
+            }
+
+            if (showPlayerIndex) {
+                datasets.push({
+                    label: '閒勝指數',
+                    data: data.map(d => ({ x: d.index + 1, y: 0.5 })),
+                    borderColor: 'rgb(0, 200, 100)',
+                    backgroundColor: 'rgba(0, 200, 100, 0)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    tension: 0
+                });
+                datasets.push({
+                    label: '_閒勝指數_0.26',
+                    data: data.map(d => ({ x: d.index + 1, y: 0.26 })),
+                    borderColor: 'rgb(0, 200, 100)',
+                    backgroundColor: 'rgba(0, 200, 100, 0)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0,
+                    pointHoverRadius: 0,
+                    tension: 0
+                });
+            }
+
+            if (showJumpRatio) {
+                datasets.push({
+                    label: '跳連比率',
+                    data: data.map(d => ({ x: d.index + 1, y: d.jumpRatio })),
+                    borderColor: 'rgb(255, 140, 0)',
+                    backgroundColor: 'rgba(255, 140, 0, 0.1)',
+                    borderWidth: 2,
+                    pointRadius: pointRadius,
+                    pointHoverRadius: 5,
+                    tension: 0.1
+                });
+            }
+
+            // 檢測是否為手機
+            const isMobile = window.innerWidth <= 768;
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: { datasets: datasets },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: !isMobile,
+                    aspectRatio: isMobile ? 1 : 2,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: '百家樂累積勝率曲線圖',
+                            font: { size: isMobile ? 14 : 18, weight: 'bold' }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { 
+                                font: { size: isMobile ? 10 : 14 },
+                                padding: isMobile ? 8 : 10,
+                                boxWidth: isMobile ? 25 : 40,
+                                filter: function(item) {
+                                    return !item.text.startsWith('_');
+                                }
+                            }
+                        },
+                        datalabels: {
+                            display: showValues && !isMobile,
+                            align: 'top',
+                            anchor: 'end',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: function(value) {
+                                return value.y.toFixed(2);
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const d = data[context.parsed.x - 1];
+                                    if (!d) return context.dataset.label + ': ' + context.parsed.y.toFixed(2);
+                                    return [
+                                        context.dataset.label + ': ' + context.parsed.y.toFixed(2),
+                                        '第' + (d.index + 1) + '局: ' + d.result,
+                                        '莊:' + d.bankerCount + ' 閒:' + d.playerCount,
+                                        '跳連比率: ' + d.jumpRatio.toFixed(2)
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            min: 0,
+                            max: Math.max(data.length, 21),
+                            title: {
+                                display: true,
+                                text: '局數',
+                                font: { size: isMobile ? 11 : 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                stepSize: isMobile ? 5 : 1,
+                                font: { size: isMobile ? 9 : 11 },
+                                callback: function(value) {
+                                    return Number.isInteger(value) && value >= 0 ? value : '';
+                                }
+                            },
+                            grid: {
+                                display: showGrid,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        },
+                        y: {
+                            min: 0,
+                            max: 1,
+                            title: {
+                                display: true,
+                                text: '比率',
+                                font: { size: isMobile ? 11 : 14, weight: 'bold' }
+                            },
+                            ticks: {
+                                stepSize: 0.1,
+                                font: { size: isMobile ? 9 : 11 },
+                                callback: function(value) {
+                                    return value.toFixed(1);
+                                }
+                            },
+                            grid: {
+                                display: showGrid,
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // 點擊模態視窗外部關閉
+        window.onclick = function(event) {
+            const modal = document.getElementById('chartModal');
+            if (event.target === modal) {
+                closeChartModal();
+            }
+        }
+    </script>
+
+    <!-- 曲線圖模態視窗 -->
+    <div id="chartModal" class="chart-modal">
+        <div class="chart-modal-content">
+            <div class="chart-modal-header">
+                <h2><i class="fas fa-chart-line"></i> 百家樂累積勝率曲線圖</h2>
+                <span class="chart-close" onclick="closeChartModal()">&times;</span>
+            </div>
+
+            <div class="chart-options">
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowBanker" checked onchange="drawChartInModal()">
+                    <span>莊比率</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowPlayer" checked onchange="drawChartInModal()">
+                    <span>閒比率</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowPlayerIndex" onchange="drawChartInModal()">
+                    <span>閒勝指數</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowJumpRatio" onchange="drawChartInModal()">
+                    <span>跳連比率</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowValues" checked onchange="drawChartInModal()">
+                    <span>顯示數值</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowPoints" checked onchange="drawChartInModal()">
+                    <span>顯示節點</span>
+                </label>
+                <label class="chart-checkbox-label">
+                    <input type="checkbox" id="chartShowGrid" checked onchange="drawChartInModal()">
+                    <span>顯示網格</span>
+                </label>
+            </div>
+
+            <div style="background: #fff3cd; padding: 12px 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #ffc107;">
+                <div style="color: #856404; font-size: 13px; line-height: 1.6;">
+                    <strong><i class="fas fa-info-circle"></i> 跳連比率說明：</strong><br>
+                    <span style="color: #2ed573; font-weight: bold;">▲ 高於 0.26</span> = 跳旺（單跳較多，建議跟跳）<br>
+                    <span style="color: #ff6348; font-weight: bold;">▼ 低於 0.26</span> = 連旺（連開較多，建議跟連）
+                </div>
+            </div>
+
+            <div class="chart-canvas-container">
+                <canvas id="chartCanvas"></canvas>
+            </div>
+
+            <div class="chart-data-table">
+                <h3><i class="fas fa-table"></i> 詳細數據表</h3>
+                <div class="chart-data-table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th><span class="desktop-only">局數</span><span class="mobile-only">局</span></th>
+                                <th>結果</th>
+                                <th><span class="desktop-only">莊累計</span><span class="mobile-only">莊</span></th>
+                                <th><span class="desktop-only">閒累計</span><span class="mobile-only">閒</span></th>
+                                <th><span class="desktop-only">總局數</span><span class="mobile-only">總</span></th>
+                                <th><span class="desktop-only">莊比率</span><span class="mobile-only">莊率</span></th>
+                                <th><span class="desktop-only">閒比率</span><span class="mobile-only">閒率</span></th>
+                                <th><span class="desktop-only">跳連比率</span><span class="mobile-only">跳連</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="chartDataTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div><!-- 閉合 mainApp -->
+
+    <script>
+        // ===== 激活碼系統 =====
+        let deviceId = '';
+
+        // 生成設備ID (邀請碼)
+        function generateDeviceId() {
+            // 嘗試從多個來源生成唯一ID
+            const sources = [
+                navigator.userAgent,
+                navigator.language,
+                navigator.platform,
+                screen.width + 'x' + screen.height,
+                new Date().getTimezoneOffset(),
+                navigator.hardwareConcurrency || 'unknown',
+                navigator.deviceMemory || 'unknown'
+            ];
+            
+            const fingerprint = sources.join('|');
+            
+            // 使用簡單的哈希算法生成設備ID
+            let hash = 0;
+            for (let i = 0; i < fingerprint.length; i++) {
+                const char = fingerprint.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            
+            // 轉換為16進制並補足長度
+            const hexHash = Math.abs(hash).toString(16).padStart(8, '0');
+            const timestamp = Date.now().toString(36).substring(0, 8);
+            
+            return (hexHash + timestamp).substring(0, 16).toLowerCase();
+        }
+
+        // SHA-256 算法 (返回字節數組)
+        async function sha256Bytes(input) {
+            let msgBuffer;
+            if (typeof input === 'string') {
+                msgBuffer = new TextEncoder().encode(input);
+            } else {
+                msgBuffer = input;
+            }
+            return await crypto.subtle.digest('SHA-256', msgBuffer);
+        }
+
+        // 生成激活碼 (與 activation.html 完全相同的算法)
+        async function generateActivationCode(deviceId) {
+            // 第一步: deviceId + "FUMU_2025" + deviceId長度
+            const text = deviceId + 'FUMU_2025' + deviceId.length;
+            
+            // 第二步: SHA-256三次迭代
+            let hashBytes = await sha256Bytes(text);
+            hashBytes = await sha256Bytes(hashBytes);
+            hashBytes = await sha256Bytes(hashBytes);
+            
+            // 第三步: 轉換為十六進制字符串
+            const hashArray = Array.from(new Uint8Array(hashBytes));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // 第四步: 取前12位並轉大寫
+            return hashHex.substring(0, 12).toUpperCase();
+        }
+
+        // 驗證激活碼
+        async function verifyActivationCode(deviceId, inputCode) {
+            const correctCode = await generateActivationCode(deviceId);
+            return inputCode.toUpperCase().trim() === correctCode;
+        }
+
+        // 複製設備ID
+        function copyDeviceId() {
+            const deviceIdText = document.getElementById('deviceIdDisplay').textContent;
+            
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(deviceIdText).then(() => {
+                    // 靜默複製,不顯示彈窗
+                }).catch(() => {
+                    fallbackCopy(deviceIdText);
+                });
+            } else {
+                fallbackCopy(deviceIdText);
+            }
+        }
+
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                // 靜默複製,不顯示彈窗
+            } catch (err) {
+                // 靜默失敗,不顯示彈窗
+            }
+            document.body.removeChild(textarea);
+        }
+
+        // 激活應用
+        async function activateApp() {
+            const inputCode = document.getElementById('activationCodeInput').value.trim();
+            const messageDiv = document.getElementById('activationMessage');
+            
+            if (!inputCode) {
+                messageDiv.innerHTML = '<div class="activation-error"><i class="fas fa-exclamation-circle"></i> 請輸入激活碼!</div>';
+                return;
+            }
+            
+            if (inputCode.length !== 12) {
+                messageDiv.innerHTML = '<div class="activation-error"><i class="fas fa-exclamation-circle"></i> 激活碼格式錯誤! 應為12位字符</div>';
+                return;
+            }
+            
+            // 驗證激活碼
+            const isValid = await verifyActivationCode(deviceId, inputCode);
+            
+            if (isValid) {
+                // 激活成功
+                messageDiv.innerHTML = '<div class="activation-success"><i class="fas fa-check-circle"></i> 激活成功! 正在進入系統...</div>';
+                
+                // 保存激活狀態
+                localStorage.setItem('fumu_activated', 'true');
+                localStorage.setItem('fumu_device_id', deviceId);
+                localStorage.setItem('fumu_activation_code', inputCode.toUpperCase());
+                localStorage.setItem('fumu_activation_date', new Date().toISOString());
+                
+                // 延遲進入主應用
+                setTimeout(() => {
+                    document.body.classList.add('activated');
+                }, 1000);
+            } else {
+                // 激活失敗
+                messageDiv.innerHTML = '<div class="activation-error"><i class="fas fa-times-circle"></i> 激活碼錯誤! 請檢查後重試</div>';
+                document.getElementById('activationCodeInput').value = '';
+                document.getElementById('activationCodeInput').focus();
+            }
+        }
+
+        // 檢查激活狀態
+        function checkActivationStatus() {
+            const isActivated = localStorage.getItem('fumu_activated') === 'true';
+            const savedDeviceId = localStorage.getItem('fumu_device_id');
+            
+            // 生成或使用已保存的設備ID
+            if (savedDeviceId) {
+                deviceId = savedDeviceId;
+            } else {
+                deviceId = generateDeviceId();
+                localStorage.setItem('fumu_device_id', deviceId);
+            }
+            
+            // 顯示設備ID
+            document.getElementById('deviceIdDisplay').textContent = deviceId;
+            
+            // 如果已激活，直接進入主應用
+            if (isActivated) {
+                document.body.classList.add('activated');
+            }
+        }
+
+        // Enter鍵快捷激活
+        document.addEventListener('DOMContentLoaded', function() {
+            checkActivationStatus();
+            
+            const activationInput = document.getElementById('activationCodeInput');
+            if (activationInput) {
+                activationInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        activateApp();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
