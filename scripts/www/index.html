@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=3.0, user-scalable=yes">
     <title>百家樂多路單智能分析系統</title>
+    
+    <!-- iOS Safari 主畫面圖標 - 使用照片 -->
+    <link rel="apple-touch-icon" href="fumu_bear.png">
+    
+    <!-- iOS Safari 設定 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="商天子">
+    
+    <!-- Android Chrome -->
+    <link rel="icon" type="image/png" href="fumu_bear.png">
+    
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
@@ -363,12 +375,159 @@
 
         .header-title {
             text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
         .header-title h1 {
             font-size: 20px;
             color: #2c3e50;
             margin-bottom: 5px;
+        }
+        
+        .help-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+        
+        .help-btn:hover {
+            background: #2980b9;
+            transform: scale(1.1);
+        }
+        
+        .help-btn:active {
+            transform: scale(0.95);
+        }
+        
+        /* 說明彈窗 */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 10001;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .help-content {
+            background: white;
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .help-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .help-header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .help-close {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .help-close:hover {
+            background: #c0392b;
+            transform: rotate(90deg);
+        }
+        
+        .help-section {
+            margin-bottom: 25px;
+        }
+        
+        .help-section h3 {
+            color: #3498db;
+            font-size: 18px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .help-section h3 i {
+            font-size: 20px;
+        }
+        
+        .help-section p, .help-section ul {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 10px;
+        }
+        
+        .help-section ul {
+            padding-left: 25px;
+        }
+        
+        .help-section li {
+            margin-bottom: 8px;
+        }
+        
+        .help-highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+            color: #856404;
+        }
+        
+        .help-example {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 4px solid #3498db;
+            margin: 10px 0;
         }
 
         /* 輸入區 */
@@ -588,7 +747,7 @@
                 width: 100%;
                 margin-top: 8px;
                 padding-top: 8px;
-                border-top: 1px solid #dee2e6; /* 改為較深的灰色 */
+                border-top: 1px solid #e0e0e0; /* 較細的淡灰色分隔線 */
             }
             
             .ai-mode-row label {
@@ -602,6 +761,40 @@
                 width: auto;
                 margin: 0;
                 padding: 0;
+            }
+            
+            /* 策略功能區樣式 */
+            .strategy-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: wrap;
+                width: 100%;
+                margin-top: 8px;
+                padding-top: 8px;
+                border-top: 1px solid #dee2e6;
+            }
+            
+            .strategy-row label {
+                display: inline-flex !important;
+                align-items: center;
+                gap: 3px !important;
+                white-space: nowrap;
+            }
+            
+            .strategy-row input[type="radio"],
+            .strategy-row input[type="checkbox"] {
+                width: auto;
+                margin: 0;
+                padding: 0;
+            }
+            
+            .strategy-row .strategy-input {
+                width: 50px;
+                padding: 3px 5px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 13px;
             }
 
             textarea {
@@ -644,6 +837,64 @@
 
             .collapsible-content.show {
                 display: block;
+            }
+        }
+        
+        /* 進場和換房設定樣式 */
+        .entry-change-room-settings {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        /* 資金管理設定樣式 */
+        .money-management-settings {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        /* 預設（電腦版）：無分隔線，內容直接顯示 */
+        .mobile-divider {
+            border-top: none;
+            margin: 0;
+            padding-top: 0;
+        }
+        
+        .mobile-separator {
+            display: none; /* 電腦版隱藏豎線 */
+        }
+        
+        /* 手機版：顯示分隔線和豎線 */
+        @media (max-width: 600px) {
+            .mobile-divider {
+                border-top: 1px solid #e0e0e0;
+                margin: 10px 0;
+                padding-top: 10px;
+            }
+            
+            .mobile-separator {
+                display: inline;
+                margin: 0 5px;
+                color: #ddd;
+            }
+            
+            /* 手機版資金管理優化 */
+            .money-management-settings .bet-amount-btn {
+                white-space: nowrap;
+                flex-shrink: 0;
+                min-width: 90px;
+            }
+            
+            .money-management-settings .random-input {
+                width: 60px !important;
+                flex-shrink: 0;
+            }
+            
+            .money-management-settings .random-label {
+                flex-shrink: 0;
             }
         }
 
@@ -974,13 +1225,34 @@
 
         .ai-main-prediction {
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 0.9375rem; /* 15px */
+            gap: 0.625rem; /* 10px */
             margin-bottom: 0.75rem; /* 12px */
             padding: 0.9375rem; /* 15px */
             background: rgba(255,255,255,0.2);
             border-radius: 0.375rem; /* 6px */
+        }
+        
+        .ai-prediction-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.9375rem; /* 15px */
+            width: 100%;
+            min-height: 60px; /* 確保有足夠高度 */
+            padding: 0 100px; /* 左右留空間給層數和提醒 */
+        }
+        
+        /* 電腦版右側提醒容器 */
+        .desktop-alerts-container {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            gap: 10px;
         }
 
         .ai-label {
@@ -1076,7 +1348,96 @@
             .ai-main-prediction {
                 padding: 12px;
                 flex-direction: column !important;
+            }
+            
+            .ai-prediction-content {
+                flex-wrap: wrap !important;
                 justify-content: center !important;
+                padding: 0 80px !important; /* 手機版左右留空間 */
+                min-height: 50px !important;
+            }
+            
+            /* 手機版關閉右側容器的絕對定位 - 改為相對定位容器 */
+            .desktop-alerts-container {
+                position: static !important;
+                transform: none !important;
+                display: block !important;
+                width: 0 !important;
+                height: 0 !important;
+            }
+            
+            /* 手機版所有提醒都用絕對定位,可以堆疊在同一位置 */
+            .desktop-alerts-container > span {
+                position: absolute !important;
+                margin: 0 !important;
+            }
+            
+            /* 重注、長龍 - 右側中間 */
+            .heavy-bet-alert {
+                right: 12px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+            }
+            
+            .long-dragon-alert {
+                right: 12px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+            }
+            
+            /* 進場、換房 - 中間上方 */
+            .entry-alert {
+                left: 50% !important;
+                top: 12px !important;
+                transform: translateX(-50%) !important;
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+            }
+            
+            .change-room-alert {
+                left: 50% !important;
+                top: 12px !important;
+                transform: translateX(-50%) !important;
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+            }
+            
+            /* 止盈、止損 - 顯示在層數下方 */
+            .take-profit-alert {
+                left: 12px !important;
+                top: 50% !important;
+                transform: translateY(20px) !important; /* 往下偏移,顯示在層數下方 */
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+                z-index: 999 !important;
+            }
+            
+            .stop-loss-alert {
+                left: 12px !important;
+                top: 50% !important;
+                transform: translateY(20px) !important; /* 往下偏移,顯示在層數下方 */
+                font-size: 11px !important;
+                padding: 3px 8px !important;
+                z-index: 999 !important;
+            }
+            
+            /* 層數 - 左側中間 */
+            .bet-level-alert {
+                position: absolute !important;
+                left: 12px !important;
+                top: 50% !important;
+                transform: translateY(-50%) !important;
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+                font-size: 11px !important;
+                padding: 5px 8px !important;
+                text-align: center !important;
+                line-height: 1.2 !important;
+                z-index: 1000 !important;
             }
 
             .ai-result {
@@ -1087,28 +1448,31 @@
                 grid-template-columns: 1fr;
             }
             
-            /* 手機版重注建議位置調整到右上角 */
-            .heavy-bet-alert {
-                position: absolute !important;
-                right: 12px !important;
-                top: 12px !important;
-                margin-left: 0 !important;
-                font-size: 12px !important;
-                padding: 3px 10px !important;
+            /* 重注、長龍 - 右側中間堆疊 */
+            .heavy-bet-alert.has-multiple {
+                top: calc(50% - 15px) !important;
+                transform: translateY(0) !important;
             }
             
-            .long-dragon-alert {
-                position: absolute !important;
-                right: 12px !important;
-                top: 42px !important; /* 放在重注提醒下方 */
-                margin-left: 0 !important;
-                font-size: 12px !important;
-                padding: 3px 10px !important;
+            .long-dragon-alert.has-multiple {
+                top: calc(50% + 15px) !important;
+                transform: translateY(0) !important;
+            }
+            
+            /* 進場、換房 - 中間上方,共用同一位置 */
+            .entry-alert.has-multiple {
+                top: 12px !important;
+                transform: translateX(-50%) !important;
+            }
+            
+            .change-room-alert.has-multiple {
+                top: 12px !important;
+                transform: translateX(-50%) !important;
             }
             
             /* 手機版特定調整 - rem 單位會自動根據螢幕大小縮放 */
             .ai-main-prediction {
-                min-height: 5rem; /* 確保雙提醒時有足夠空間 */
+                min-height: 12rem; /* 確保七個提醒時有足夠空間 */
             }
         }
 
@@ -1361,6 +1725,156 @@
             .chart-data-table th:nth-child(7) { width: 18%; } /* 閒比率 */
             .chart-data-table th:nth-child(8) { width: 18%; } /* 跳連比率 */
         }
+        
+        /* ===== 下注金額模態框樣式 ===== */
+        .bet-modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+
+        .bet-modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bet-modal-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .bet-modal-header h3 {
+            margin: 0;
+            font-size: 20px;
+        }
+
+        .bet-modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .bet-modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .bet-modal-body {
+            padding: 25px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .bet-levels-setting {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .bet-level-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #3498db;
+        }
+
+        .bet-level-item label {
+            font-weight: bold;
+            min-width: 80px;
+            color: #2c3e50;
+        }
+
+        .bet-level-item input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .bet-level-item input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .bet-modal-footer {
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-radius: 0 0 15px 15px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* 手機版優化 */
+        @media (max-width: 600px) {
+            .bet-modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+
+            .bet-modal-header h3 {
+                font-size: 16px;
+            }
+
+            .bet-level-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .bet-level-item label {
+                min-width: auto;
+            }
+
+            .bet-level-item input {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1419,6 +1933,9 @@
             <div class="header">
                 <div class="header-title">
                     <h1>富沐國際-多路單分析系統</h1>
+                    <button class="help-btn" onclick="openHelpModal()" title="功能說明">
+                        <i class="fas fa-question"></i>
+                    </button>
                 </div>
             </div>
 
@@ -1426,8 +1943,8 @@
         <div class="input-section">
             <textarea id="inputSeq" placeholder="輸入開牌記錄 (B=莊, P=閒)&#10;範例: BPBPPBBBPBPB"></textarea>
             <div class="input-controls">
-                <button class="btn btn-banker" onclick="addResult('B')">莊 (B)</button>
-                <button class="btn btn-player" onclick="addResult('P')">閒 (P)</button>
+                <button class="btn btn-banker" onclick="handleBankerClick()">莊 (B)</button>
+                <button class="btn btn-player" onclick="handlePlayerClick()">閒 (P)</button>
                 <button class="btn btn-undo" onclick="undo()">
                     <i class="fas fa-undo"></i> 撤銷
                 </button>
@@ -1489,6 +2006,72 @@
                             <input type="number" id="winRateThreshold" class="random-input" value="50" min="0" max="100" style="width: 50px;">
                             <span class="random-label">%</span>
                         </div>
+                        
+                        <!-- 策略功能區 -->
+                        <div class="strategy-row">
+                            <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="checkbox" id="enableStrategy" style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0; font-weight: bold;">策略功能</span>
+                            </label>
+                            <span style="margin: 0 10px; color: #dee2e6;">|</span>
+                            <span class="random-label">跟隨連敗:</span>
+                            <input type="number" id="normalBetCount" class="strategy-input" value="2" min="1" max="99">
+                            <span class="random-label">把</span>
+                            <span class="random-label" style="margin-left: 8px;">單跳連敗:</span>
+                            <input type="number" id="reverseBetCount" class="strategy-input" value="2" min="1" max="99">
+                            <span class="random-label">把</span>
+                            <span class="random-label" style="margin-left: 8px;">連敗看一把:</span>
+                            <input type="number" id="skipBetCount" class="strategy-input" value="3" min="1" max="99">
+                            <span class="random-label">次</span>
+                            <span style="margin: 0 10px; color: #dee2e6;">|</span>
+                            <label style="display: inline-flex; align-items: center; gap: 5px; cursor: pointer;">
+                                <input type="radio" id="strategyPlanA" name="strategyPlan" checked style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">A方案(先跟隨)</span>
+                            </label>
+                            <label style="display: inline-flex; align-items: center; gap: 5px; margin-left: 8px; cursor: pointer;">
+                                <input type="radio" id="strategyPlanB" name="strategyPlan" style="cursor: pointer;">
+                                <span class="random-label" style="margin: 0;">B方案(先單跳)</span>
+                            </label>
+                        </div>
+                        
+                        <!-- 分隔線（僅手機版顯示） -->
+                        <div class="mobile-divider">
+                            <!-- 進場和換房設定 -->
+                            <div class="entry-change-room-settings">
+                                <span class="random-label" style="color: #3a7bd5; font-weight: bold;">🎯進場:</span>
+                                <input type="number" id="entryRound" class="random-input" value="1" min="1" max="200" style="border: 2px solid #3a7bd5; width: 60px;">
+                                
+                                <span class="random-label" style="color: #eb3349; font-weight: bold;">⚠️換房條件:</span>
+                                <span class="random-label" style="color: #eb3349;">AI正確率</span>
+                                <input type="number" id="aiAccuracyThreshold" class="random-input" value="50" min="0" max="100" style="border: 2px solid #eb3349; width: 50px;">
+                                <span class="random-label" style="color: #eb3349;">%</span>
+                                <span class="random-label" style="color: #eb3349;">最多連錯</span>
+                                <input type="number" id="maxLoseThreshold" class="random-input" value="5" min="1" max="20" style="border: 2px solid #eb3349; width: 50px;">
+                                <span class="random-label" style="color: #eb3349;">次</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 資金管理區 -->
+                        <div class="mobile-divider">
+                            <div class="money-management-settings">
+                                <span class="random-label" style="color: #27ae60; font-weight: bold;">💰資金管理:</span>
+                                <button class="btn bet-amount-btn" onclick="openBetAmountModal()" style="padding: 4px 12px; font-size: 12px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px;">
+                                    <i class="fas fa-coins"></i> 下注金額
+                                </button>
+                                <label style="margin-right: 10px; color: #666;">
+                                    <input type="checkbox" id="manualBetMode" style="cursor: pointer;">
+                                    <span class="random-label" style="color: #9b59b6;">手動下注</span>
+                                </label>
+                                <span class="random-label" style="color: #27ae60;">本金</span>
+                                <input type="number" id="initialBalance" class="random-input" value="10000" min="0" step="100" style="border: 2px solid #27ae60; width: 60px;">
+                                <span class="random-label" style="color: #27ae60;">餘額</span>
+                                <input type="number" id="currentBalance" class="random-input" value="10000" min="0" step="100" style="border: 2px solid #27ae60; width: 60px;">
+                                <span class="random-label" style="color: #f39c12;">止盈</span>
+                                <input type="number" id="takeProfitAmount" class="random-input" value="2000" min="0" step="100" style="border: 2px solid #f39c12; width: 60px;">
+                                <span class="random-label" style="color: #e74c3c;">止損</span>
+                                <input type="number" id="stopLossAmount" class="random-input" value="3000" min="0" step="100" style="border: 2px solid #e74c3c; width: 60px;">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1502,16 +2085,46 @@
             </div>
             <div class="ai-content">
                 <div class="ai-main-prediction" style="position: relative;">
+                    <!-- 層數提醒 - 左側中間絕對定位 -->
+                    <span class="bet-level-alert" id="betLevelAlert" style="display: none; position: absolute; left: 12px; top: 50%; transform: translateY(-50%); padding: 5px 14px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; box-shadow: 0 3px 8px rgba(102, 126, 234, 0.5); border: 2px solid rgba(255, 255, 255, 0.3);">
+                        📊 第1層
+                    </span>
+                    
+                    <!-- 右側提醒容器 - 絕對定位 -->
+                    <div class="desktop-alerts-container">
+                        <!-- 重注提醒 -->
+                        <span class="heavy-bet-alert" id="heavyBetAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(255, 107, 107, 0.5); border: 2px solid rgba(255, 255, 255, 0.3);">
+                            💎 重注
+                        </span>
+                        <!-- 長龍提醒 -->
+                        <span class="long-dragon-alert" id="longDragonAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(255, 165, 2, 0.5); border: 2px solid rgba(255, 255, 255, 0.3);">
+                            🐉 長龍
+                        </span>
+                        <!-- 進場提醒 - 使用綠色系突出顯示 -->
+                        <span class="entry-alert" id="entryAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(0, 210, 255, 0.5); border: 2px solid rgba(255, 255, 255, 0.3);">
+                            🎯 進場
+                        </span>
+                        <!-- 換房提醒 - 使用深紅色強烈警告 -->
+                        <span class="change-room-alert" id="changeRoomAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(235, 51, 73, 0.6); border: 2px solid rgba(255, 255, 255, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                            🏠 換房
+                        </span>
+                        <!-- 止盈提醒 - 使用金色系 -->
+                        <span class="take-profit-alert" id="takeProfitAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(243, 156, 18, 0.5); border: 2px solid rgba(255, 255, 255, 0.3);">
+                            🎉 止盈
+                        </span>
+                        <!-- 止損提醒 - 使用深紅色強烈警告 -->
+                        <span class="stop-loss-alert" id="stopLossAlert" style="display: none; padding: 5px 14px; background: linear-gradient(135deg, #c0392b 0%, #8e44ad 100%); color: white; border-radius: 8px; font-weight: bold; font-size: 14px; animation: pulse 1.5s infinite; box-shadow: 0 3px 8px rgba(192, 57, 43, 0.6); border: 2px solid rgba(255, 255, 255, 0.4); text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                            🛑 止損
+                        </span>
+                    </div>
+                    
+                    <!-- 上方:AI建議下注標題 -->
                     <span class="ai-label">AI 建議下注:</span>
-                    <span class="ai-result" id="aiMainResult">--</span>
-                    <!-- 重注提醒 -->
-                    <span class="heavy-bet-alert" id="heavyBetAlert" style="display: none; margin-left: 15px; padding: 4px 12px; background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%); color: white; border-radius: 6px; font-weight: bold; font-size: 13px; animation: pulse 1.5s infinite; box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);">
-                        💎 重注
-                    </span>
-                    <!-- 長龍提醒 -->
-                    <span class="long-dragon-alert" id="longDragonAlert" style="display: none; margin-left: 15px; padding: 4px 12px; background: linear-gradient(135deg, #ffa502 0%, #ff6348 100%); color: white; border-radius: 6px; font-weight: bold; font-size: 13px; animation: pulse 1.5s infinite; box-shadow: 0 2px 6px rgba(255, 165, 2, 0.4);">
-                        🐉 長龍
-                    </span>
+                    
+                    <!-- 下方:結果固定在中間 -->
+                    <div class="ai-prediction-content">
+                        <span class="ai-result" id="aiMainResult" onclick="handleAISuggestionClick()" style="cursor: pointer;">--</span>
+                    </div>
                 </div>
                 <div class="ai-stats-grid">
                     <div class="ai-stat-item" id="aiStreakCountItem">
@@ -1539,6 +2152,11 @@
                         <span class="ai-stat-value" id="jumpRatioValue">0.00</span>
                         <span class="ai-stat-value" id="jumpRatioHint" style="font-size: 12px; margin-left: 5px;"></span>
                     </div>
+                    <!-- 策略狀態顯示 -->
+                    <div class="ai-stat-item" id="strategyStatusItem" style="display: none; grid-column: 1 / -1; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; margin-top: 8px;">
+                        <span class="ai-stat-label">策略狀態:</span>
+                        <span class="ai-stat-value" id="strategyStatus" style="font-weight: bold;">--</span>
+                    </div>
                 </div>
                 <div class="ai-warnings" id="aiWarnings" style="display: none;">
                     <div class="ai-warning-title">
@@ -1552,6 +2170,38 @@
 
         <!-- 路單網格 -->
         <div id="roadsGrid" class="roads-grid"></div>
+        
+        <!-- 下注金額設定模態框 -->
+        <div id="betAmountModal" class="bet-modal" style="display: none;">
+            <div class="bet-modal-content">
+                <div class="bet-modal-header">
+                    <h3><i class="fas fa-coins"></i> 下注金額設定</h3>
+                    <button class="bet-modal-close" onclick="closeBetAmountModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="bet-modal-body">
+                    <div class="bet-levels-setting">
+                        <label style="font-weight: bold; margin-right: 10px;">設定關數（層數）:</label>
+                        <input type="number" id="betLevelsCount" value="6" min="1" max="20" style="width: 60px; padding: 5px; border: 2px solid #3498db; border-radius: 4px;">
+                        <button onclick="generateBetLevels()" style="margin-left: 10px; padding: 5px 15px; background: #3498db; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-sync"></i> 生成
+                        </button>
+                    </div>
+                    <div id="betLevelsContainer" style="margin-top: 20px;">
+                        <!-- 動態生成的關數輸入框會顯示在這裡 -->
+                    </div>
+                </div>
+                <div class="bet-modal-footer">
+                    <button onclick="saveBetAmounts()" style="padding: 10px 30px; background: #27ae60; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                        <i class="fas fa-save"></i> 儲存設定
+                    </button>
+                    <button onclick="closeBetAmountModal()" style="margin-left: 10px; padding: 10px 30px; background: #95a5a6; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        取消
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -1560,6 +2210,26 @@
         let lastLongDragonLength = 0; // 記錄上次長龍的長度，用來判斷是否是新的長龍
         let longDragonInterventionUsed = false; // 記錄長龍介入是否已使用
         let jumpInterventionUsed = false; // 記錄跳介入是否已使用
+        
+        // 策略功能相關變數
+        let strategyMode = 'follow'; // 'follow' (跟隨上一把結果) 或 'reverse' (單跳-反向上一把)
+        let strategyErrorCount = 0; // 當前模式的連敗次數
+        let strategySkipNextBet = false; // 是否跳過下一把(看一把)
+        let currentAISuggestion = null; // 當前AI建議 (用於判斷是否正確)
+        let lastResult = null; // 上一把的結果 (用於策略判斷)
+        let justSkippedBet = false; // 標記剛剛執行過「看一把」,用於重置連錯狀態
+        
+        // AI連錯狀態 (全局變數,供策略狀態顯示使用)
+        let currentConsecutiveStreak = 0; // 當前連中/連錯次數
+        let currentIsWinStreak = false; // 當前是連中(true)還是連錯(false)
+        
+        // 手動下注模式相關變數
+        let manualBetSelected = false; // 是否已選擇下注AI建議
+        let currentAIBet = null; // 當前AI建議的下注 ('B' 或 'P')
+        
+        let betAmounts = []; // 儲存各層下注金額
+        let currentBetLevel = 0; // 當前所在的層數（0開始）
+        let betHistory = []; // 記錄每一筆交易：{ round, betAmount, result, balanceBefore, balanceAfter, levelBefore, levelAfter }
         
         // 路單配置 - 根據圖片每種路單有不同的顯示行數
         const roadConfigs = [
@@ -1602,30 +2272,372 @@
         function addResult(result) {
             // 在添加新結果前,先檢查是否有AI預測,並記錄預測結果
             const aiResultElement = document.getElementById('aiMainResult');
+            let aiPrediction = null;
+            let isSkipBet = false; // 標記是否為「看一把」
             
             if (aiResultElement && aiResultElement.textContent !== '--') {
                 const aiPredText = aiResultElement.textContent.trim();
-                let aiPrediction = null;
                 
-                if (aiPredText.includes('莊') || aiPredText.includes('(B)')) {
+                // 檢查是否為「看一把」
+                if (aiPredText.includes('看一把')) {
+                    isSkipBet = true;
+                    console.log('⏸️ 這一把是「看一把」,不記錄AI預測');
+                    // 設置標記,表示剛執行過「看一把」
+                    justSkippedBet = true;
+                } else if (aiPredText.includes('莊') || aiPredText.includes('(B)')) {
                     aiPrediction = 'B';
                 } else if (aiPredText.includes('閒') || aiPredText.includes('(P)')) {
                     aiPrediction = 'P';
                 }
                 
-                // 如果有有效的AI預測,記錄這次預測和實際結果
-                if (aiPrediction) {
+                // 如果有有效的AI預測(不是看一把),記錄這次預測和實際結果
+                if (aiPrediction && !isSkipBet) {
                     const isCorrect = (aiPrediction === result);
                     aiPredictionHistory.push({
                         prediction: aiPrediction,
                         actual: result,
-                        isCorrect: isCorrect
+                        isCorrect: isCorrect,
+                        isSkip: false
                     });
+                    
+                    // 策略功能邏輯
+                    const enableStrategy = document.getElementById('enableStrategy')?.checked || false;
+                    if (enableStrategy) {
+                        console.log('========== 策略判斷開始 ==========');
+                        console.log(`當前模式: ${strategyMode}`);
+                        console.log(`AI預測: ${aiPrediction}, 實際結果: ${result}, 是否正確: ${isCorrect}`);
+                        
+                        const normalBetCount = parseInt(document.getElementById('normalBetCount')?.value) || 2;
+                        const reverseBetCount = parseInt(document.getElementById('reverseBetCount')?.value) || 2;
+                        
+                        if (isCorrect) {
+                            // 預測正確,重置連敗計數
+                            console.log('✅ 策略預測正確,重置連敗計數');
+                            strategyErrorCount = 0;
+                        } else {
+                            // 預測錯誤,增加連敗計數
+                            strategyErrorCount++;
+                            console.log(`❌ 策略預測錯誤,連敗次數: ${strategyErrorCount}`);
+                            
+                            // 檢查是否需要切換模式
+                            if (strategyMode === 'follow' && strategyErrorCount >= normalBetCount) {
+                                strategyMode = 'reverse';
+                                strategyErrorCount = 0;
+                                console.log(`🔄 跟隨模式連敗${normalBetCount}次,切換到單跳模式`);
+                            } else if (strategyMode === 'reverse' && strategyErrorCount >= reverseBetCount) {
+                                strategyMode = 'follow';
+                                strategyErrorCount = 0;
+                                console.log(`🔄 單跳模式連敗${reverseBetCount}次,切換到跟隨模式`);
+                            }
+                        }
+                        console.log('========== 策略判斷結束 ==========');
+                    }
                 }
+            }
+            
+            // 更新lastResult供策略使用
+            lastResult = result;
+            
+            // 處理資金管理和下注邏輯
+            const currentSeq = document.getElementById('inputSeq').value;
+            const entryRound = parseInt(document.getElementById('entryRound').value) || 1;
+            const currentRound = currentSeq.length + 1; // 即將成為的局數
+            
+            // 檢查是否為手動下注模式
+            const isManualBetMode = document.getElementById('manualBetMode')?.checked || false;
+            
+            console.log(`當前局數: ${currentRound}, 進場局數: ${entryRound}, 手動下注模式: ${isManualBetMode}`);
+            
+            // 如果已經進場（當前局數 > 進場局數）例如：設定20進場，第21局才開始下注
+            // 且不是手動下注模式（手動模式下不自動計算資金）
+            if (currentRound > entryRound && !isManualBetMode) {
+                const initialBalanceInput = document.getElementById('initialBalance');
+                const currentBalanceInput = document.getElementById('currentBalance');
+                const takeProfitInput = document.getElementById('takeProfitAmount');
+                const stopLossInput = document.getElementById('stopLossAmount');
+                
+                console.log('已進場，開始處理資金管理');
+                console.log('currentBalanceInput:', currentBalanceInput);
+                
+                const initialBalance = parseFloat(initialBalanceInput.value) || 0;
+                let currentBalance = parseFloat(currentBalanceInput.value) || initialBalance;
+                const takeProfitAmount = parseFloat(takeProfitInput.value) || 0;
+                const stopLossAmount = parseFloat(stopLossInput.value) || 0;
+                
+                // 獲取當前應下注的金額
+                const betAmount = getCurrentBetAmount();
+                
+                console.log(`下注金額: ${betAmount}, 初始本金: ${initialBalance}`);
+                
+                // 如果有設定下注金額和資金
+                if (betAmount > 0 && initialBalance > 0) {
+                    const balanceBefore = currentBalance;
+                    const levelBefore = currentBetLevel;
+                    
+                    console.log(`🎲 第${currentRound}局下注：金額 ${betAmount}，下注前餘額 ${currentBalance.toFixed(2)}`);
+                    
+                    // 檢查是否有AI預測來判斷輸贏
+                    if (aiPrediction) {
+                        const isWin = (aiPrediction === result);
+                        
+                        if (isWin) {
+                            // 贏了：不扣本金，直接加贏得的金額
+                            let winAmount = betAmount; // 閒贏得1:1
+                            
+                            // 如果是莊贏，扣除5%抽水
+                            if (result === 'B') {
+                                winAmount = betAmount * 0.95;
+                            }
+                            
+                            currentBalance += winAmount;
+                            currentBetLevel = 0; // 回到第1層
+                            
+                            console.log(`✅ 贏了！下注: ${betAmount}, 贏得: ${winAmount.toFixed(2)}, 當前餘額: ${currentBalance.toFixed(2)}, 回到第1層`);
+                        } else {
+                            // 輸了：扣除本金
+                            currentBalance -= betAmount;
+                            
+                            // 進入下一層
+                            if (currentBetLevel < betAmounts.length - 1) {
+                                currentBetLevel++;
+                            }
+                            
+                            console.log(`❌ 輸了！下注: ${betAmount}, 損失: -${betAmount}, 當前餘額: ${currentBalance.toFixed(2)}, 進入第${currentBetLevel + 1}層`);
+                        }
+                        
+                        // 記錄這筆交易
+                        betHistory.push({
+                            round: currentRound,
+                            betAmount: betAmount,
+                            result: result,
+                            aiPrediction: aiPrediction,
+                            isWin: isWin,
+                            balanceBefore: balanceBefore,
+                            balanceAfter: currentBalance,
+                            levelBefore: levelBefore,
+                            levelAfter: currentBetLevel
+                        });
+                        
+                        // 更新餘額顯示
+                        console.log(`📝 更新餘額顯示: ${currentBalance.toFixed(2)}`);
+                        console.log('currentBalanceInput element:', currentBalanceInput);
+                        currentBalanceInput.value = currentBalance.toFixed(2);
+                        console.log('currentBalanceInput.value after update:', currentBalanceInput.value);
+                        localStorage.setItem('currentBalance', currentBalance);
+                        localStorage.setItem('currentBetLevel', currentBetLevel);
+                        
+                        // 更新層數提醒
+                        updateBetLevelAlert();
+                    } else {
+                        console.log('❌ 未執行資金管理：betAmount=' + betAmount + ', initialBalance=' + initialBalance);
+                    }
+                } else {
+                    console.log('❌ 未進場或無AI預測');
+                }
+            } else {
+                console.log('⏳ 尚未到達進場局數或手動下注模式');
             }
             
             document.getElementById('inputSeq').value += result;
             analyzeAll(); // 即時分析
+        }
+
+        // 手動下注模式：處理資金計算
+        function processManualBet(userBet, actualResult) {
+            console.log(`========== processManualBet 開始 ==========`);
+            console.log(`參數 - userBet: ${userBet}, actualResult: ${actualResult}`);
+            
+            const currentSeq = document.getElementById('inputSeq').value;
+            const entryRound = parseInt(document.getElementById('entryRound').value) || 1;
+            const currentRound = currentSeq.length; // 當前局數(已經加入結果後)
+            
+            console.log(`當前局數: ${currentRound}, 進場局數: ${entryRound}`);
+            
+            // 只有進場後才處理
+            if (currentRound <= entryRound) {
+                console.log('⏳ 尚未到達進場局數,不處理資金');
+                return;
+            }
+            
+            const initialBalanceInput = document.getElementById('initialBalance');
+            const currentBalanceInput = document.getElementById('currentBalance');
+            
+            const initialBalance = parseFloat(initialBalanceInput.value) || 0;
+            let currentBalance = parseFloat(currentBalanceInput.value) || initialBalance;
+            
+            // 獲取當前應下注的金額
+            const betAmount = getCurrentBetAmount();
+            
+            if (betAmount <= 0 || initialBalance <= 0) {
+                console.log('❌ 未設定下注金額或本金');
+                return;
+            }
+            
+            const balanceBefore = currentBalance;
+            const levelBefore = currentBetLevel;
+            
+            console.log(`🎲 手動下注 - 第${currentRound}局：下注${userBet === 'B' ? '莊' : '閒'}, 實際結果${actualResult === 'B' ? '莊' : '閒'}, 金額 ${betAmount}`);
+            console.log(`下注前餘額: ${balanceBefore.toFixed(2)}, 下注前層數: ${levelBefore + 1}`);
+            
+            const isWin = (userBet === actualResult);
+            console.log(`判斷輸贏: userBet(${userBet}) === actualResult(${actualResult}) ? ${isWin ? '✅贏了' : '❌輸了'}`);
+            
+            if (isWin) {
+                // 贏了：不扣本金，直接加贏得的金額
+                let winAmount = betAmount; // 閒贏得1:1
+                
+                // 如果是莊贏，扣除5%抽水
+                if (actualResult === 'B') {
+                    winAmount = betAmount * 0.95;
+                    console.log(`莊贏扣5%抽水: ${betAmount} * 0.95 = ${winAmount.toFixed(2)}`);
+                }
+                
+                currentBalance += winAmount;
+                currentBetLevel = 0; // 回到第1層
+                
+                console.log(`✅ 贏了！下注: ${betAmount}, 贏得: ${winAmount.toFixed(2)}, 當前餘額: ${currentBalance.toFixed(2)}, 回到第1層`);
+            } else {
+                // 輸了：扣除本金
+                currentBalance -= betAmount;
+                
+                // 進入下一層
+                if (currentBetLevel < betAmounts.length - 1) {
+                    currentBetLevel++;
+                }
+                
+                console.log(`❌ 輸了！下注: ${betAmount}, 損失: -${betAmount}, 當前餘額: ${currentBalance.toFixed(2)}, 進入第${currentBetLevel + 1}層`);
+            }
+            
+            console.log(`========== processManualBet 結束 ==========`);
+            
+            // 記錄這筆交易
+            betHistory.push({
+                round: currentRound,
+                betAmount: betAmount,
+                result: actualResult,
+                userBet: userBet,
+                isWin: isWin,
+                balanceBefore: balanceBefore,
+                balanceAfter: currentBalance,
+                levelBefore: levelBefore,
+                levelAfter: currentBetLevel
+            });
+            
+            // 更新餘額顯示
+            currentBalanceInput.value = currentBalance.toFixed(2);
+            localStorage.setItem('currentBalance', currentBalance);
+            localStorage.setItem('currentBetLevel', currentBetLevel);
+            
+            // 更新層數提醒
+            updateBetLevelAlert();
+        }
+
+        // 處理莊按鈕點擊
+        function handleBankerClick() {
+            handleResultClick('B');
+        }
+
+        // 處理閒按鈕點擊
+        function handlePlayerClick() {
+            handleResultClick('P');
+        }
+
+        // 處理莊閒按鈕點擊的通用函數
+        function handleResultClick(actualResult) {
+            const isManualBetMode = document.getElementById('manualBetMode')?.checked || false;
+            
+            if (isManualBetMode) {
+                // 手動下注模式：檢查是否已選擇下注AI建議
+                if (manualBetSelected && currentAIBet) {
+                    // 已選擇下注,先保存用戶的下注選擇(因為addResult會觸發analyzeAll重置它)
+                    const savedUserBet = currentAIBet;
+                    
+                    console.log(`✅ 手動下注確認: 下注${savedUserBet === 'B' ? '莊' : '閒'}, 實際開出${actualResult === 'B' ? '莊' : '閒'}`);
+                    
+                    // 重置選擇狀態(在addResult之前)
+                    manualBetSelected = false;
+                    currentAIBet = null;
+                    
+                    // 記錄結果(會觸發analyzeAll)
+                    addResult(actualResult);
+                    
+                    // 計算資金(使用保存的下注)
+                    processManualBet(savedUserBet, actualResult);
+                    
+                    // 重置高亮
+                    resetAISuggestionHighlight();
+                } else {
+                    // 未選擇下注,直接記錄結果(不計算資金)
+                    console.log(`⚠️ 未選擇下注,僅記錄結果: ${actualResult === 'B' ? '莊' : '閒'}`);
+                    addResult(actualResult);
+                }
+            } else {
+                // 自動模式：直接記錄結果
+                addResult(actualResult);
+            }
+        }
+
+        // 處理AI建議框點擊
+        function handleAISuggestionClick() {
+            const isManualBetMode = document.getElementById('manualBetMode')?.checked || false;
+            
+            if (!isManualBetMode) {
+                // 非手動模式,不處理點擊
+                return;
+            }
+            
+            const aiMainResultElement = document.getElementById('aiMainResult');
+            const aiText = aiMainResultElement.textContent;
+            
+            // 判斷AI建議是莊還是閒
+            let suggestedBet = null;
+            if (aiText.includes('莊') || aiText.includes('(B)')) {
+                suggestedBet = 'B';
+            } else if (aiText.includes('閒') || aiText.includes('(P)')) {
+                suggestedBet = 'P';
+            } else if (aiText.includes('看一把')) {
+                alert('當前是「看一把」狀態,無法下注');
+                return;
+            } else {
+                alert('尚無AI建議');
+                return;
+            }
+            
+            if (manualBetSelected && currentAIBet === suggestedBet) {
+                // 再次點擊相同建議,取消選擇
+                manualBetSelected = false;
+                currentAIBet = null;
+                resetAISuggestionHighlight();
+                console.log('❌ 取消下注選擇');
+            } else {
+                // 選擇下注AI建議
+                manualBetSelected = true;
+                currentAIBet = suggestedBet;
+                highlightAISuggestion();
+                console.log(`✅ 選擇下注: ${suggestedBet === 'B' ? '莊' : '閒'}`);
+            }
+        }
+
+        // 高亮AI建議框(金黃色外框)
+        function highlightAISuggestion() {
+            const aiMainResultElement = document.getElementById('aiMainResult');
+            aiMainResultElement.style.border = '4px solid #FFD700'; // 金黃色外框
+            aiMainResultElement.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.8)'; // 金色光暈
+        }
+
+        // 重置AI建議框樣式
+        function resetAISuggestionHighlight() {
+            const aiMainResultElement = document.getElementById('aiMainResult');
+            const aiText = aiMainResultElement.textContent;
+            
+            // 根據當前狀態重置樣式
+            if (aiText.includes('看一把')) {
+                aiMainResultElement.style.border = '3px solid #ff9800';
+                aiMainResultElement.style.boxShadow = '0 0 15px rgba(255, 152, 0, 0.6)';
+            } else {
+                aiMainResultElement.style.border = 'none';
+                aiMainResultElement.style.boxShadow = 'none';
+            }
         }
 
         // 撤銷最後一個輸入
@@ -1641,11 +2653,28 @@
                     aiPredictionHistory.pop();
                 }
                 
+                // 還原資金：如果有交易記錄，撤銷最後一筆
+                if (betHistory.length > 0) {
+                    const lastBet = betHistory.pop(); // 取出並刪除最後一筆
+                    
+                    // 還原餘額和層數
+                    const currentBalanceInput = document.getElementById('currentBalance');
+                    currentBalanceInput.value = lastBet.balanceBefore.toFixed(2);
+                    currentBetLevel = lastBet.levelBefore;
+                    
+                    localStorage.setItem('currentBalance', lastBet.balanceBefore);
+                    localStorage.setItem('currentBetLevel', lastBet.levelBefore);
+                    
+                    console.log(`↩️ 撤銷第${lastBet.round}局：餘額 ${lastBet.balanceAfter.toFixed(2)} → ${lastBet.balanceBefore.toFixed(2)}，層數 ${lastBet.levelAfter + 1} → ${lastBet.levelBefore + 1}`);
+                    
+                    // 更新層數提醒
+                    updateBetLevelAlert();
+                }
+                
                 // 重新分析
                 analyzeAll();
             }
         }
-
         // 隨機生成莊閒
         function randomGenerate() {
             const minCount = parseInt(document.getElementById('minCount').value) || 50;
@@ -1705,12 +2734,62 @@
 
         // 清除
         function clearAll() {
+            console.log('=== 開始清除所有數據 ===');
+            
             document.getElementById('inputSeq').value = '';
             sequence = [];
             aiPredictionHistory = []; // 清除AI預測歷史
+            betHistory = []; // 清除交易歷史
             lastLongDragonLength = 0; // 重置長龍狀態
             longDragonInterventionUsed = false; // 重置長龍介入標記
             jumpInterventionUsed = false; // 重置跳介入標記
+            
+            // 重置策略功能變數
+            strategyMode = 'follow';
+            strategyErrorCount = 0;
+            strategySkipNextBet = false;
+            currentAISuggestion = null;
+            lastResult = null;
+            justSkippedBet = false;
+            currentConsecutiveStreak = 0;
+            currentIsWinStreak = false;
+            
+            console.log('已清除: sequence, aiPredictionHistory, betHistory, 長龍/跳標記, 策略變數');
+            
+            // 重置資金管理：餘額回到本金，回到第1層
+            const initialBalanceInput = document.getElementById('initialBalance');
+            const currentBalanceInput = document.getElementById('currentBalance');
+            const initialBalance = parseFloat(initialBalanceInput.value) || 0;
+            
+            console.log('本金:', initialBalance);
+            
+            if (initialBalance > 0) {
+                currentBalanceInput.value = initialBalance;
+                localStorage.setItem('currentBalance', initialBalance);
+                console.log('已將當前餘額重置為本金:', initialBalance);
+            } else {
+                // 如果本金為0,則清除localStorage中的餘額
+                localStorage.removeItem('currentBalance');
+                console.log('本金為0,已清除localStorage中的餘額');
+            }
+            
+            currentBetLevel = 0; // 回到第1層
+            localStorage.setItem('currentBetLevel', 0);
+            console.log('已將層數重置為第1層 (currentBetLevel = 0)');
+            
+            // 隱藏層數提醒
+            document.getElementById('betLevelAlert').style.display = 'none';
+            
+            // 隱藏止盈止損提醒
+            document.getElementById('takeProfitAlert').style.display = 'none';
+            document.getElementById('stopLossAlert').style.display = 'none';
+            
+            console.log('=== 清除完成 ===');
+            console.log('localStorage currentBalance:', localStorage.getItem('currentBalance'));
+            console.log('localStorage currentBetLevel:', localStorage.getItem('currentBetLevel'));
+            console.log('betHistory.length:', betHistory.length);
+            console.log('aiPredictionHistory.length:', aiPredictionHistory.length);
+            
             initializeEmptyRoads();
             // 隱藏 AI 預測區塊
             document.getElementById('aiPrediction').style.display = 'none';
@@ -2118,23 +3197,158 @@
                 interventionType = 'jump';
             }
             
+            // ========================================
+            // 策略功能: 計算當前AI連錯狀態
+            // ========================================
+            // 提前計算 consecutiveStreak,用於判斷是否該顯示「看一把」
+            currentConsecutiveStreak = 0;
+            currentIsWinStreak = false;
+            
+            if (aiPredictionHistory.length > 0) {
+                // 找到最後一個不是 isSkip 的記錄
+                let lastValidIndex = -1;
+                for (let i = aiPredictionHistory.length - 1; i >= 0; i--) {
+                    if (!aiPredictionHistory[i].isSkip) {
+                        lastValidIndex = i;
+                        break;
+                    }
+                }
+                
+                if (lastValidIndex >= 0) {
+                    const lastPredResult = aiPredictionHistory[lastValidIndex].isCorrect;
+                    let streak = 1; // 至少有最後一筆
+                    
+                    // 往前計算連續相同結果的次數
+                    for (let i = lastValidIndex - 1; i >= 0; i--) {
+                        // 跳過 isSkip 的記錄
+                        if (aiPredictionHistory[i].isSkip) {
+                            continue;
+                        }
+                        
+                        if (aiPredictionHistory[i].isCorrect === lastPredResult) {
+                            streak++;
+                        } else {
+                            // 遇到不同結果就停止
+                            break;
+                        }
+                    }
+                    
+                    currentConsecutiveStreak = streak;
+                    currentIsWinStreak = lastPredResult;
+                }
+            }
+            
+            console.log(`[當前連錯狀態] 連錯:${currentConsecutiveStreak}, 是連中:${currentIsWinStreak}`);
+            
+            // 檢查是否啟用策略功能
+            const enableStrategy = document.getElementById('enableStrategy')?.checked || false;
+            
+            // 檢查是否需要顯示「看一把」(基於當前的連錯次數)
+            // 如果剛執行過「看一把」,這次不再觸發,讓使用者繼續玩
+            const skipBetSetting = parseInt(document.getElementById('skipBetCount')?.value) || 3;
+            let shouldShowSkipBet = false;
+            if (justSkippedBet) {
+                console.log(`[看一把後] 剛執行過「看一把」,本次不再觸發,重置標記`);
+                justSkippedBet = false; // 重置標記,下次如果還是連錯就會再觸發
+                shouldShowSkipBet = false; // 不顯示「看一把」
+            } else {
+                // 檢查連錯次數是否為設定值的倍數 (3,6,9... 或 2,4,6... 等)
+                shouldShowSkipBet = enableStrategy && 
+                                    !currentIsWinStreak && 
+                                    currentConsecutiveStreak > 0 && 
+                                    currentConsecutiveStreak % skipBetSetting === 0 && 
+                                    skipBetSetting > 0;
+                if (shouldShowSkipBet) {
+                    console.log(`⏸️ 當前AI連錯${currentConsecutiveStreak}次,為${skipBetSetting}的倍數,本次顯示「看一把」`);
+                }
+            }
+            
+            // 如果啟用策略功能,根據當前模式和上一把結果調整最終建議
+            let displaySuggestion = finalSuggestion;
+            
+            // 優先檢查是否該顯示「看一把」
+            if (shouldShowSkipBet) {
+                displaySuggestion = null; // 不給建議,顯示「看一把」
+            } else if (enableStrategy && lastResult !== null) {
+                console.log(`========== 策略調整開始 ==========`);
+                console.log(`strategyMode 值: "${strategyMode}" (型別: ${typeof strategyMode})`);
+                console.log(`上一把結果: ${lastResult}`);
+                console.log(`AI原始建議: ${finalSuggestion}`);
+                console.log(`連敗次數: ${strategyErrorCount}`);
+                const isPlanA = document.getElementById('strategyPlanA')?.checked;
+                const isPlanB = document.getElementById('strategyPlanB')?.checked;
+                console.log(`方案選擇 - A方案: ${isPlanA}, B方案: ${isPlanB}`);
+                
+                // 根據策略模式調整建議 (根據上一把結果,而不是 AI 建議)
+                if (strategyMode === 'follow') {
+                    // 跟隨模式:跟隨上一把結果
+                    displaySuggestion = lastResult;
+                    console.log(`✅ 跟隨模式 - 顯示建議調整為: ${displaySuggestion} (跟隨上一把 ${lastResult})`);
+                } else if (strategyMode === 'reverse') {
+                    // 單跳模式:反向上一把結果
+                    displaySuggestion = lastResult === 'B' ? 'P' : 'B';
+                    console.log(`✅ 單跳模式 - 顯示建議調整為: ${displaySuggestion} (反向上一把 ${lastResult})`);
+                }
+                console.log(`========== 策略調整結束 ==========`);
+            } else if (enableStrategy && lastResult === null) {
+                console.log(`策略功能啟用但還沒有上一把結果 (lastResult=${lastResult})`);
+                // 第一把還沒有結果,顯示 AI 原始建議
+                displaySuggestion = finalSuggestion;
+            } else if (enableStrategy) {
+                console.log(`策略功能啟用但無上一把結果 (lastResult=${lastResult})`);
+            }
+            
             // 主要建議 (文字白色，框框背景根據結果變色)
+            // 始終顯示莊(B)或閒(P),不管策略功能是否啟用
             const aiMainResultElement = document.getElementById('aiMainResult');
-            if (finalSuggestion === 'B') {
+            
+            // 檢查是否處於「看一把」狀態
+            if (displaySuggestion === null) {
+                aiMainResultElement.textContent = '⏸️ 看一把';
+                aiMainResultElement.style.color = '#ffc107'; // 黃色文字
+                aiMainResultElement.style.background = 'linear-gradient(135deg, #ff9800 0%, #ff5722 100%)';
+                aiMainResultElement.style.border = '3px solid #ff9800';
+                aiMainResultElement.style.fontWeight = 'bold';
+                aiMainResultElement.style.boxShadow = '0 0 15px rgba(255, 152, 0, 0.6)';
+            } else if (displaySuggestion === 'B') {
                 aiMainResultElement.textContent = '莊 (B)' + (interventionType === 'dragon' ? ' 🐉' : interventionType === 'jump' ? ' 🔄' : '');
                 aiMainResultElement.style.color = '#ffffff'; // 白色文字
                 aiMainResultElement.style.background = '#ff4757'; // 紅色背景
                 aiMainResultElement.style.fontWeight = 'bold';
-            } else if (finalSuggestion === 'P') {
+                aiMainResultElement.style.border = 'none'; // 重置邊框
+                aiMainResultElement.style.boxShadow = 'none'; // 重置陰影
+                
+                // 如果啟用策略功能,在建議後面加上策略模式標記 (但不要與介入符號重複)
+                if (enableStrategy && lastResult !== null && !interventionType) {
+                    if (strategyMode === 'follow') {
+                        aiMainResultElement.textContent += ' ⚡';
+                    } else if (strategyMode === 'reverse') {
+                        aiMainResultElement.textContent += ' 👟';
+                    }
+                }
+            } else if (displaySuggestion === 'P') {
                 aiMainResultElement.textContent = '閒 (P)' + (interventionType === 'dragon' ? ' 🐉' : interventionType === 'jump' ? ' 🔄' : '');
                 aiMainResultElement.style.color = '#ffffff'; // 白色文字
                 aiMainResultElement.style.background = '#1e90ff'; // 藍色背景
                 aiMainResultElement.style.fontWeight = 'bold';
+                aiMainResultElement.style.border = 'none'; // 重置邊框
+                aiMainResultElement.style.boxShadow = 'none'; // 重置陰影
+                
+                // 如果啟用策略功能,在建議後面加上策略模式標記 (但不要與介入符號重複)
+                if (enableStrategy && lastResult !== null && !interventionType) {
+                    if (strategyMode === 'follow') {
+                        aiMainResultElement.textContent += ' ⚡';
+                    } else if (strategyMode === 'reverse') {
+                        aiMainResultElement.textContent += ' 🏠';
+                    }
+                }
             } else {
                 aiMainResultElement.textContent = '看一把';
                 aiMainResultElement.style.color = '#ffffff'; // 白色文字
                 aiMainResultElement.style.background = 'rgba(255,255,255,0.3)'; // 保持半透明白色
                 aiMainResultElement.style.fontWeight = 'normal';
+                aiMainResultElement.style.border = 'none';
+                aiMainResultElement.style.boxShadow = 'none';
             }
             
             // 重注判斷邏輯
@@ -2176,7 +3390,7 @@
             
             // 顯示或隱藏重注提醒 (需要4路以上符合條件)
             if (matchingRoadsCount >= 4) {
-                heavyBetAlert.style.display = 'inline-block';
+                heavyBetAlert.style.display = 'block';
             } else {
                 heavyBetAlert.style.display = 'none';
             }
@@ -2210,6 +3424,14 @@
             let maxWinStreak = 0;  // 最多連中次數
             let maxLoseStreak = 0; // 最多連錯次數
             
+            // 先輸出 aiPredictionHistory 的簡潔記錄
+            if (aiPredictionHistory.length > 0) {
+                const historyStr = aiPredictionHistory.map((r, i) => 
+                    `${i+1}:${r.prediction}→${r.actual}${r.isCorrect ? '✓' : '✗'}`
+                ).join(' ');
+                console.log(`📋 AI預測記錄(${aiPredictionHistory.length}筆):`, historyStr);
+            }
+            
             if (aiPredictionHistory.length > 0) {
                 const lastResult = aiPredictionHistory[aiPredictionHistory.length - 1].isCorrect;
                 let streak = 0;
@@ -2230,6 +3452,7 @@
                 let currentWinStreak = 0;
                 let currentLoseStreak = 0;
                 
+                // 遍歷整個 aiPredictionHistory 找出最長的連錯
                 for (let i = 0; i < aiPredictionHistory.length; i++) {
                     if (aiPredictionHistory[i].isCorrect) {
                         currentWinStreak++;
@@ -2368,7 +3591,7 @@
                     hintElement.style.padding = '2px 8px';
                     hintElement.style.borderRadius = '4px';
                     // 連旺時顯示長龍提醒
-                    longDragonAlert.style.display = 'inline-block';
+                    longDragonAlert.style.display = 'block';
                 } else {
                     hintElement.textContent = '(平衡)';
                     hintElement.style.color = '#ffffff'; // 白色文字
@@ -2403,6 +3626,259 @@
                 });
             } else {
                 warningsDiv.style.display = 'none';
+            }
+            
+            // ========================================
+            // 進場提醒邏輯
+            // ========================================
+            const entryAlert = document.getElementById('entryAlert');
+            const entryRound = parseInt(document.getElementById('entryRound')?.value) || 1;
+            
+            if (sequence.length === entryRound) {
+                entryAlert.style.display = 'block';
+            } else {
+                entryAlert.style.display = 'none';
+            }
+            
+            // ========================================
+            // 換房提醒邏輯 (必須同時滿足兩個條件)
+            // ========================================
+            const changeRoomAlert = document.getElementById('changeRoomAlert');
+            const aiAccuracyThreshold = parseFloat(document.getElementById('aiAccuracyThreshold')?.value) || 50;
+            const maxLoseThreshold = parseInt(document.getElementById('maxLoseThreshold')?.value) || 5;
+            
+            console.log('=== 換房條件檢查 ===');
+            console.log('AI正確率:', accuracyRate, '(數值:', parseFloat(accuracyRate), ')');
+            console.log('AI正確率門檻:', aiAccuracyThreshold);
+            console.log('最多連錯:', maxLoseStreak);
+            console.log('最多連錯門檻:', maxLoseThreshold);
+            console.log('當前序列長度:', sequence.length);
+            console.log('AI局數:', aiStartRound);
+            
+            // 顯示 aiPredictionHistory 的詳細內容
+            console.log('--- aiPredictionHistory 詳細記錄 ---');
+            console.log('總共記錄數:', aiPredictionHistory.length);
+            aiPredictionHistory.forEach((record, index) => {
+                const status = record.isCorrect ? '✓正確' : '✗錯誤';
+                console.log(`  ${index + 1}. 預測:${record.prediction} 實際:${record.actual} ${status}`);
+            });
+            
+            // 手動再算一次最多連錯,並顯示過程
+            let tempLoseStreak = 0;
+            let tempMaxLoseStreak = 0;
+            console.log('--- 手動計算最多連錯 ---');
+            aiPredictionHistory.forEach((record, index) => {
+                if (record.isCorrect) {
+                    if (tempLoseStreak > 0) {
+                        console.log(`  位置 ${index}: 正確,結束連錯 (連錯了${tempLoseStreak}次)`);
+                        tempMaxLoseStreak = Math.max(tempMaxLoseStreak, tempLoseStreak);
+                        tempLoseStreak = 0;
+                    }
+                } else {
+                    tempLoseStreak++;
+                }
+            });
+            // 處理最後可能還在連錯中
+            tempMaxLoseStreak = Math.max(tempMaxLoseStreak, tempLoseStreak);
+            if (tempLoseStreak > 0) {
+                console.log(`  最後還在連錯中: ${tempLoseStreak}次`);
+            }
+            console.log(`手動計算結果: 最多連錯 = ${tempMaxLoseStreak} 次`);
+            console.log(`程式計算結果: 最多連錯 = ${maxLoseStreak} 次`);
+            console.log('------');
+            
+            let shouldShowChangeRoom = false;
+            let condition1Met = false; // AI正確率低於設定值
+            let condition2Met = false; // 最多連錯達到設定值
+            
+            // 條件1: AI正確率低於設定值 (不管AI局數,只要有計算出正確率就檢查)
+            if (accuracyRate !== '--' && parseFloat(accuracyRate) < aiAccuracyThreshold) {
+                condition1Met = true;
+                console.log(`✓ 換房條件1達成: AI正確率 ${accuracyRate}% 低於設定的 ${aiAccuracyThreshold}%`);
+            } else {
+                console.log(`✗ 換房條件1未達成: accuracyRate=${accuracyRate}, ${parseFloat(accuracyRate)} < ${aiAccuracyThreshold}? ${parseFloat(accuracyRate) < aiAccuracyThreshold}`);
+            }
+            
+            // 條件2: 最多連錯達到或超過設定值 (不管AI局數,只要有預測記錄就檢查)
+            if (maxLoseStreak >= maxLoseThreshold) {
+                condition2Met = true;
+                console.log(`✓ 換房條件2達成: 最多連錯 ${maxLoseStreak} 次，達到設定的 ${maxLoseThreshold} 次`);
+            } else {
+                console.log(`✗ 換房條件2未達成: ${maxLoseStreak} >= ${maxLoseThreshold}? ${maxLoseStreak >= maxLoseThreshold}`);
+            }
+            
+            // 必須同時滿足兩個條件
+            if (condition1Met && condition2Met) {
+                shouldShowChangeRoom = true;
+                console.log(`⚠️ 換房提醒顯示: 兩個條件都已滿足！`);
+            } else if (condition1Met || condition2Met) {
+                console.log(`ℹ️ 換房條件未完全滿足: 條件1=${condition1Met}, 條件2=${condition2Met}`);
+            }
+            
+            if (shouldShowChangeRoom) {
+                changeRoomAlert.style.display = 'block';
+            } else {
+                changeRoomAlert.style.display = 'none';
+            }
+            
+            // ========================================
+            // 止盈止損提醒邏輯
+            // ========================================
+            const takeProfitAlert = document.getElementById('takeProfitAlert');
+            const stopLossAlert = document.getElementById('stopLossAlert');
+            const initialBalance = parseFloat(document.getElementById('initialBalance')?.value) || 10000;
+            const currentBalance = parseFloat(document.getElementById('currentBalance')?.value) || 10000;
+            const takeProfitAmount = parseFloat(document.getElementById('takeProfitAmount')?.value) || 2000;
+            const stopLossAmount = parseFloat(document.getElementById('stopLossAmount')?.value) || 3000;
+            
+            const profitAmount = currentBalance - initialBalance; // 獲利金額
+            const lossAmount = initialBalance - currentBalance;   // 虧損金額
+            
+            // 止盈判斷: 獲利金額達到設定值
+            if (profitAmount >= takeProfitAmount && takeProfitAmount > 0) {
+                takeProfitAlert.style.display = 'block';
+                console.log(`🎉 止盈提醒: 已獲利 ${profitAmount}，達到止盈目標 ${takeProfitAmount}`);
+            } else {
+                takeProfitAlert.style.display = 'none';
+            }
+            
+            // 止損判斷: 虧損金額達到設定值
+            if (lossAmount >= stopLossAmount && stopLossAmount > 0) {
+                stopLossAlert.style.display = 'block';
+                console.log(`🛑 止損提醒: 已虧損 ${lossAmount}，達到止損線 ${stopLossAmount}`);
+            } else {
+                stopLossAlert.style.display = 'none';
+            }
+            
+            // ========================================
+            // 手機版提醒位置動態調整
+            // ========================================
+            adjustMobileAlertPositions();
+            
+            // 更新層數提醒
+            updateBetLevelAlert();
+            
+            // 更新策略狀態顯示
+            updateStrategyStatus();
+            
+            // 重置手動下注選擇狀態(AI建議更新時)
+            if (manualBetSelected) {
+                manualBetSelected = false;
+                currentAIBet = null;
+                resetAISuggestionHighlight();
+            }
+        }
+        
+        // 手機版提醒位置動態調整函數
+        // 防抖動變量
+        let adjustPositionTimeout = null;
+        
+        function adjustMobileAlertPositions() {
+            // 清除之前的定時器
+            if (adjustPositionTimeout) {
+                clearTimeout(adjustPositionTimeout);
+            }
+            
+            // 延遲執行,避免頻繁調用
+            adjustPositionTimeout = setTimeout(() => {
+                // 右側提醒: 重注、長龍、進場、換房
+                const rightAlerts = [
+                    document.getElementById('heavyBetAlert'),
+                    document.getElementById('longDragonAlert'),
+                    document.getElementById('entryAlert'),
+                    document.getElementById('changeRoomAlert')
+                ];
+                
+                // 找出右側顯示中的提醒
+                const visibleRightAlerts = rightAlerts.filter(alert => 
+                    alert && window.getComputedStyle(alert).display !== 'none'
+                );
+                
+                // 移除所有右側提醒的 has-multiple 類別
+                rightAlerts.forEach(alert => {
+                    if (alert) {
+                        alert.classList.remove('has-multiple');
+                    }
+                });
+                
+                // 如果右側有多個提醒,對所有右側提醒添加 has-multiple 類別
+                if (visibleRightAlerts.length > 1) {
+                    rightAlerts.forEach(alert => {
+                        if (alert) {
+                            alert.classList.add('has-multiple');
+                        }
+                    });
+                }
+            }, 50); // 延遲 50ms
+        }
+        
+        // 更新層數提醒顯示
+        function updateBetLevelAlert() {
+            const betLevelAlert = document.getElementById('betLevelAlert');
+            const currentSeq = document.getElementById('inputSeq').value;
+            const entryRound = parseInt(document.getElementById('entryRound').value) || 1;
+            const currentRound = currentSeq.length;
+            
+            // 如果已經進場且有設定下注金額
+            if (currentRound > entryRound && betAmounts.length > 0) {
+                // 獲取當前層的金額
+                const currentAmount = betAmounts[currentBetLevel] || 0;
+                // 顯示層數和金額
+                betLevelAlert.innerHTML = `📊 第${currentBetLevel + 1}層<br><span style="font-size: 12px;">(${currentAmount})</span>`;
+                betLevelAlert.style.display = 'block';
+            } else {
+                betLevelAlert.style.display = 'none';
+            }
+            
+            // 更新手機版位置
+            adjustMobileAlertPositions();
+        }
+        
+        // 更新策略狀態顯示
+        function updateStrategyStatus() {
+            const strategyStatusItem = document.getElementById('strategyStatusItem');
+            const strategyStatusValue = document.getElementById('strategyStatus');
+            const enableStrategy = document.getElementById('enableStrategy')?.checked || false;
+            
+            console.log(`更新策略狀態 - 啟用: ${enableStrategy}, 模式: ${strategyMode}, 連敗次數: ${strategyErrorCount}`);
+            
+            if (enableStrategy && strategyStatusItem && strategyStatusValue) {
+                strategyStatusItem.style.display = 'block';
+                const followLoseCount = parseInt(document.getElementById('normalBetCount')?.value) || 2;
+                const reverseLoseCount = parseInt(document.getElementById('reverseBetCount')?.value) || 2;
+                const skipBetCount = parseInt(document.getElementById('skipBetCount')?.value) || 3;
+                const isPlanA = document.getElementById('strategyPlanA')?.checked || false;
+                const planName = isPlanA ? 'A方案(先跟隨)' : 'B方案(先單跳)';
+                const modeName = strategyMode === 'follow' ? '跟隨' : '單跳';
+                const maxLoses = strategyMode === 'follow' ? followLoseCount : reverseLoseCount;
+                
+                // 檢查是否正在顯示「看一把」
+                const aiMainResultElement = document.getElementById('aiMainResult');
+                const isShowingSkipBet = aiMainResultElement && aiMainResultElement.textContent.includes('看一把');
+                
+                if (isShowingSkipBet) {
+                    strategyStatusValue.textContent = `${planName} - ⏸️ 看一把 (AI連錯${currentConsecutiveStreak}次)`;
+                    strategyStatusValue.style.color = '#ffc107'; // 黃色
+                    strategyStatusValue.style.fontWeight = 'bold';
+                    strategyStatusValue.style.textShadow = '0 0 5px rgba(255,193,7,0.5)';
+                } else {
+                    strategyStatusValue.textContent = `${planName} - ${modeName} (連敗 ${strategyErrorCount}/${maxLoses})`;
+                    console.log(`策略狀態已更新: ${strategyStatusValue.textContent}`);
+                    
+                    // 根據模式設置顏色 - 使用更明顯的顏色
+                    if (strategyMode === 'follow') {
+                        strategyStatusValue.style.color = '#00FF00'; // 亮綠色表示跟隨
+                        strategyStatusValue.style.fontWeight = 'bold';
+                        strategyStatusValue.style.textShadow = '0 0 5px rgba(0,255,0,0.5)';
+                    } else {
+                        strategyStatusValue.style.color = '#FFA500'; // 亮橘色表示單跳
+                        strategyStatusValue.style.fontWeight = 'bold';
+                        strategyStatusValue.style.textShadow = '0 0 5px rgba(255,165,0,0.5)';
+                    }
+                }
+            } else if (strategyStatusItem) {
+                strategyStatusItem.style.display = 'none';
+                console.log(`策略狀態隱藏 - enableStrategy: ${enableStrategy}`);
             }
         }
 
@@ -3580,6 +5056,15 @@
             await checkLoginStatus();
             initializeEmptyRoads(); // 初始化顯示所有空路單
             
+            // ========================================
+            // 載入下注金額設定
+            // ========================================
+            const savedBetAmounts = localStorage.getItem('betAmounts');
+            if (savedBetAmounts) {
+                betAmounts = JSON.parse(savedBetAmounts);
+                console.log('已載入儲存的下注金額設定:', betAmounts);
+            }
+            
             // 從 localStorage 讀取並設定 AI局數
             const savedAiStartRound = localStorage.getItem('aiStartRound');
             if (savedAiStartRound !== null) {
@@ -3799,6 +5284,242 @@
                 });
             }
             
+            // ========================================
+            // 新增功能: 進場局數監聽器
+            // ========================================
+            const savedEntryRound = localStorage.getItem('entryRound');
+            if (savedEntryRound !== null) {
+                document.getElementById('entryRound').value = savedEntryRound;
+                console.log('已載入儲存的進場局數:', savedEntryRound);
+            }
+            
+            const entryRoundInput = document.getElementById('entryRound');
+            if (entryRoundInput) {
+                entryRoundInput.addEventListener('change', function() {
+                    if (entryRoundInput.value === '' || entryRoundInput.value === null) {
+                        entryRoundInput.value = '1';
+                    }
+                    const value = parseInt(entryRoundInput.value);
+                    if (value < 1) {
+                        entryRoundInput.value = '1';
+                    }
+                    localStorage.setItem('entryRound', entryRoundInput.value);
+                    console.log('進場局數已變更為:', entryRoundInput.value, '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // ========================================
+            // 新增功能: AI正確率閾值監聽器
+            // ========================================
+            const savedAiAccuracyThreshold = localStorage.getItem('aiAccuracyThreshold');
+            if (savedAiAccuracyThreshold !== null) {
+                document.getElementById('aiAccuracyThreshold').value = savedAiAccuracyThreshold;
+                console.log('已載入儲存的AI正確率閾值:', savedAiAccuracyThreshold + '%');
+            }
+            
+            const aiAccuracyThresholdInput = document.getElementById('aiAccuracyThreshold');
+            if (aiAccuracyThresholdInput) {
+                aiAccuracyThresholdInput.addEventListener('change', function() {
+                    let value = parseFloat(this.value);
+                    if (isNaN(value) || value < 0) {
+                        value = 0;
+                        this.value = 0;
+                    } else if (value > 100) {
+                        value = 100;
+                        this.value = 100;
+                    }
+                    localStorage.setItem('aiAccuracyThreshold', value);
+                    console.log('AI正確率閾值已變更為:', value + '% → 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // ========================================
+            // 新增功能: 最多連錯閾值監聽器
+            // ========================================
+            const savedMaxLoseThreshold = localStorage.getItem('maxLoseThreshold');
+            if (savedMaxLoseThreshold !== null) {
+                document.getElementById('maxLoseThreshold').value = savedMaxLoseThreshold;
+                console.log('已載入儲存的最多連錯閾值:', savedMaxLoseThreshold + '次');
+            }
+            
+            const maxLoseThresholdInput = document.getElementById('maxLoseThreshold');
+            if (maxLoseThresholdInput) {
+                maxLoseThresholdInput.addEventListener('change', function() {
+                    if (maxLoseThresholdInput.value === '' || maxLoseThresholdInput.value === null) {
+                        maxLoseThresholdInput.value = '5';
+                    }
+                    
+            // ========================================
+            // 新增功能: 策略功能勾選狀態儲存/載入
+            // ========================================
+            const savedEnableStrategy = localStorage.getItem('enableStrategy');
+            const enableStrategyCheckbox = document.getElementById('enableStrategy');
+            if (enableStrategyCheckbox) {
+                if (savedEnableStrategy === 'true') {
+                    enableStrategyCheckbox.checked = true;
+                    console.log('已載入策略功能狀態: 啟用');
+                } else {
+                    enableStrategyCheckbox.checked = false;
+                    console.log('已載入策略功能狀態: 停用');
+                }
+                
+                // 監聽變化並儲存
+                enableStrategyCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('enableStrategy', this.checked);
+                    console.log('策略功能已', this.checked ? '啟用' : '停用', '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll(); // 重新分析以更新策略狀態
+                    }
+                });
+            }
+            
+            // ========================================
+            // 新增功能: 手動下注模式勾選狀態儲存/載入
+            // ========================================
+            const savedManualBetMode = localStorage.getItem('manualBetMode');
+            const manualBetModeCheckbox = document.getElementById('manualBetMode');
+            if (manualBetModeCheckbox) {
+                if (savedManualBetMode === 'true') {
+                    manualBetModeCheckbox.checked = true;
+                    console.log('已載入手動下注模式狀態: 啟用');
+                } else {
+                    manualBetModeCheckbox.checked = false;
+                    console.log('已載入手動下注模式狀態: 停用');
+                }
+                
+                // 監聽變化並儲存
+                manualBetModeCheckbox.addEventListener('change', function() {
+                    localStorage.setItem('manualBetMode', this.checked);
+                    console.log('手動下注模式已', this.checked ? '啟用' : '停用', '→ 已儲存');
+                });
+            }
+                    const value = parseInt(maxLoseThresholdInput.value);
+                    if (value < 1) {
+                        maxLoseThresholdInput.value = '1';
+                    }
+                    localStorage.setItem('maxLoseThreshold', maxLoseThresholdInput.value);
+                    console.log('最多連錯閾值已變更為:', maxLoseThresholdInput.value, '次 → 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // ========================================
+            // 新增功能: 資金管理監聽器
+            // ========================================
+            
+            // 從 localStorage 讀取並設定本金
+            const savedInitialBalance = localStorage.getItem('initialBalance');
+            if (savedInitialBalance !== null) {
+                document.getElementById('initialBalance').value = savedInitialBalance;
+                document.getElementById('currentBalance').value = savedInitialBalance; // 初始化餘額等於本金
+                console.log('已載入儲存的本金:', savedInitialBalance);
+            }
+            
+            const initialBalanceInput = document.getElementById('initialBalance');
+            if (initialBalanceInput) {
+                initialBalanceInput.addEventListener('change', function() {
+                    if (initialBalanceInput.value === '' || initialBalanceInput.value === null) {
+                        initialBalanceInput.value = '10000';
+                    }
+                    const value = parseFloat(initialBalanceInput.value);
+                    if (value < 0) {
+                        initialBalanceInput.value = '0';
+                    }
+                    localStorage.setItem('initialBalance', initialBalanceInput.value);
+                    // 本金改變時，重置餘額
+                    document.getElementById('currentBalance').value = initialBalanceInput.value;
+                    localStorage.setItem('currentBalance', initialBalanceInput.value);
+                    console.log('本金已變更為:', initialBalanceInput.value, '→ 已儲存，餘額已重置');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定止盈金額
+            const savedTakeProfitAmount = localStorage.getItem('takeProfitAmount');
+            if (savedTakeProfitAmount !== null) {
+                document.getElementById('takeProfitAmount').value = savedTakeProfitAmount;
+                console.log('已載入儲存的止盈金額:', savedTakeProfitAmount);
+            }
+            
+            const takeProfitAmountInput = document.getElementById('takeProfitAmount');
+            if (takeProfitAmountInput) {
+                takeProfitAmountInput.addEventListener('change', function() {
+                    if (takeProfitAmountInput.value === '' || takeProfitAmountInput.value === null) {
+                        takeProfitAmountInput.value = '2000';
+                    }
+                    const value = parseFloat(takeProfitAmountInput.value);
+                    if (value < 0) {
+                        takeProfitAmountInput.value = '0';
+                    }
+                    localStorage.setItem('takeProfitAmount', takeProfitAmountInput.value);
+                    console.log('止盈金額已變更為:', takeProfitAmountInput.value, '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定止損金額
+            const savedStopLossAmount = localStorage.getItem('stopLossAmount');
+            if (savedStopLossAmount !== null) {
+                document.getElementById('stopLossAmount').value = savedStopLossAmount;
+                console.log('已載入儲存的止損金額:', savedStopLossAmount);
+            }
+            
+            const stopLossAmountInput = document.getElementById('stopLossAmount');
+            if (stopLossAmountInput) {
+                stopLossAmountInput.addEventListener('change', function() {
+                    if (stopLossAmountInput.value === '' || stopLossAmountInput.value === null) {
+                        stopLossAmountInput.value = '3000';
+                    }
+                    const value = parseFloat(stopLossAmountInput.value);
+                    if (value < 0) {
+                        stopLossAmountInput.value = '0';
+                    }
+                    localStorage.setItem('stopLossAmount', stopLossAmountInput.value);
+                    console.log('止損金額已變更為:', stopLossAmountInput.value, '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
+            // 從 localStorage 讀取並設定當前餘額
+            const savedCurrentBalance = localStorage.getItem('currentBalance');
+            if (savedCurrentBalance !== null) {
+                document.getElementById('currentBalance').value = savedCurrentBalance;
+                console.log('已載入儲存的當前餘額:', savedCurrentBalance);
+            }
+            
+            // 餘額輸入框監聽（允許手動調整）
+            const currentBalanceInput = document.getElementById('currentBalance');
+            if (currentBalanceInput) {
+                currentBalanceInput.addEventListener('change', function() {
+                    if (currentBalanceInput.value === '' || currentBalanceInput.value === null) {
+                        currentBalanceInput.value = document.getElementById('initialBalance').value;
+                    }
+                    const value = parseFloat(currentBalanceInput.value);
+                    if (value < 0) {
+                        currentBalanceInput.value = '0';
+                    }
+                    localStorage.setItem('currentBalance', currentBalanceInput.value);
+                    console.log('餘額已變更為:', currentBalanceInput.value, '→ 已儲存');
+                    if (sequence.length > 0) {
+                        analyzeAll();
+                    }
+                });
+            }
+            
             // 從 localStorage 讀取並設定警示開關
             const savedEnableWarnings = localStorage.getItem('enableWarnings');
             const enableWarningsCheckbox = document.getElementById('enableWarnings');
@@ -3875,6 +5596,13 @@
                     }
                 });
             }
+        });
+        
+        // ========================================
+        // 監聽窗口大小改變，重新調整手機版提醒位置
+        // ========================================
+        window.addEventListener('resize', function() {
+            adjustMobileAlertPositions();
         });
 
         // ============ 曲線圖功能 ============
@@ -3974,6 +5702,18 @@
                 chartInstance.destroy();
                 chartInstance = null;
             }
+        }
+
+        // 開啟功能說明模態視窗
+        function openHelpModal() {
+            const modal = document.getElementById('helpModal');
+            modal.style.display = 'block';
+        }
+
+        // 關閉功能說明模態視窗
+        function closeHelpModal() {
+            const modal = document.getElementById('helpModal');
+            modal.style.display = 'none';
         }
 
         // 填充數據表
@@ -4191,8 +5931,263 @@
             if (event.target === modal) {
                 closeChartModal();
             }
+            const betModal = document.getElementById('betAmountModal');
+            if (event.target === betModal) {
+                closeBetAmountModal();
+            }
+            const helpModal = document.getElementById('helpModal');
+            if (event.target === helpModal) {
+                closeHelpModal();
+            }
+        }
+        
+        // ========================================
+        // 下注金額設定功能
+        // ========================================
+        
+        // 開啟下注金額模態框
+        function openBetAmountModal() {
+            document.getElementById('betAmountModal').style.display = 'block';
+            // 載入儲存的關數設定
+            const savedLevels = localStorage.getItem('betLevelsCount');
+            if (savedLevels) {
+                document.getElementById('betLevelsCount').value = savedLevels;
+            }
+            // 自動生成輸入框
+            generateBetLevels();
+        }
+        
+        // 關閉下注金額模態框
+        function closeBetAmountModal() {
+            document.getElementById('betAmountModal').style.display = 'none';
+        }
+        
+        // 生成下注金額輸入框
+        function generateBetLevels() {
+            const levelsCount = parseInt(document.getElementById('betLevelsCount').value) || 6;
+            const container = document.getElementById('betLevelsContainer');
+            container.innerHTML = '';
+            
+            // 從 localStorage 載入已儲存的金額
+            const savedAmounts = JSON.parse(localStorage.getItem('betAmounts') || '[]');
+            
+            for (let i = 0; i < levelsCount; i++) {
+                const levelDiv = document.createElement('div');
+                levelDiv.className = 'bet-level-item';
+                
+                const defaultAmount = savedAmounts[i] || (i === 0 ? 100 : savedAmounts[i - 1] * 2 || 100 * Math.pow(2, i));
+                
+                levelDiv.innerHTML = `
+                    <label>第 ${i + 1} 層:</label>
+                    <input type="number" 
+                           id="betLevel${i}" 
+                           value="${defaultAmount}" 
+                           min="0" 
+                           step="10" 
+                           placeholder="輸入下注金額">
+                `;
+                container.appendChild(levelDiv);
+            }
+            
+            console.log(`已生成 ${levelsCount} 層下注金額輸入框`);
+        }
+        
+        // 儲存下注金額設定
+        function saveBetAmounts() {
+            const levelsCount = parseInt(document.getElementById('betLevelsCount').value) || 6;
+            betAmounts = [];
+            
+            for (let i = 0; i < levelsCount; i++) {
+                const input = document.getElementById(`betLevel${i}`);
+                const amount = parseFloat(input.value) || 0;
+                betAmounts.push(amount);
+            }
+            
+            // 儲存到 localStorage
+            localStorage.setItem('betAmounts', JSON.stringify(betAmounts));
+            localStorage.setItem('betLevelsCount', levelsCount);
+            
+            // 重置當前層數
+            currentBetLevel = 0;
+            
+            console.log('下注金額設定已儲存:', betAmounts);
+            alert(`✅ 已儲存 ${levelsCount} 層下注金額設定！`);
+            closeBetAmountModal();
+        }
+        
+        // 計算當前應下注金額
+        function getCurrentBetAmount() {
+            if (betAmounts.length === 0) {
+                return 0;
+            }
+            // 確保不超過最大層數
+            const level = Math.min(currentBetLevel, betAmounts.length - 1);
+            return betAmounts[level];
+        }
+        
+        // 處理下注結果（贏或輸）
+        function processBetResult(isWin) {
+            if (isWin) {
+                // 贏了，回到第一層
+                currentBetLevel = 0;
+                console.log('✅ 贏了！回到第 1 層');
+            } else {
+                // 輸了，進入下一層
+                if (currentBetLevel < betAmounts.length - 1) {
+                    currentBetLevel++;
+                    console.log(`❌ 輸了！進入第 ${currentBetLevel + 1} 層`);
+                } else {
+                    console.log(`⚠️ 已經在最後一層（第 ${betAmounts.length} 層）`);
+                }
+            }
+            
+            const currentAmount = getCurrentBetAmount();
+            console.log(`當前應下注金額: ${currentAmount}`);
+            return currentAmount;
         }
     </script>
+
+    <!-- 功能說明彈窗 -->
+    <div id="helpModal" class="help-modal">
+        <div class="help-content">
+            <div class="help-header">
+                <h2><i class="fas fa-book-open"></i> 功能使用說明</h2>
+                <button class="help-close" onclick="closeHelpModal()">×</button>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-keyboard"></i> 基本操作</h3>
+                <ul>
+                    <li><span class="help-highlight">莊(B)/閒(P)</span>: 點擊按鈕記錄開牌結果</li>
+                    <li><span class="help-highlight">撤銷</span>: 刪除最後一筆記錄</li>
+                    <li><span class="help-highlight">清除</span>: 清空所有記錄和資金數據</li>
+                    <li><span class="help-highlight">曲線圖</span>: 查看累積勝率趨勢圖表</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-dice"></i> 隨機模擬</h3>
+                <ul>
+                    <li><span class="help-highlight">隨機莊閒</span>: 自動產生指定局數的開牌記錄</li>
+                    <li><span class="help-highlight">最少/最多</span>: 設定產生的局數範圍</li>
+                    <li><span class="help-highlight">AI局數</span>: 達到此局數後才開始AI預測(預設12局)</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-dragon"></i> 警示功能</h3>
+                <ul>
+                    <li><span class="help-highlight">長龍</span>: 連續相同結果達到設定次數時顯示🐉提示(預設5次)</li>
+                    <li><span class="help-highlight">跳</span>: 連續交替達到設定組數時顯示🔄提示(預設2組=BPBP)</li>
+                    <li><span class="help-highlight">警示開關</span>: 控制是否顯示長龍/跳介入提示</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-brain"></i> AI模式</h3>
+                <ul>
+                    <li><span class="help-highlight">總數莊閒</span>: 統計所有路單預測,莊閒票數多的為建議</li>
+                    <li><span class="help-highlight">勝率莊閒</span>: 只統計勝率≥設定值的預測(可過濾低勝率路單)</li>
+                </ul>
+                <div class="help-example">
+                    💡 <strong>提示</strong>: 勝率模式適合保守玩家,可設定60%以上才參考
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-chess"></i> 策略功能</h3>
+                <p>啟用後AI建議會根據上一把結果調整:</p>
+                <ul>
+                    <li><span class="help-highlight">跟隨模式</span>: 跟隨上一把結果下注(上把莊→建議莊)</li>
+                    <li><span class="help-highlight">單跳模式</span>: 反向上一把結果下注(上把莊→建議閒)</li>
+                    <li><span class="help-highlight">自動切換</span>: 連敗達到設定次數自動切換模式</li>
+                    <li><span class="help-highlight">連敗看一把</span>: AI連錯達倍數(3,6,9...)時暫停一局觀察</li>
+                </ul>
+                <div class="help-example">
+                    ⚡ <strong>A方案</strong>: 先跟隨,連敗2次後切換單跳<br>
+                    👟 <strong>B方案</strong>: 先單跳,連敗2次後切換跟隨
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-flag"></i> 進場與換房</h3>
+                <ul>
+                    <li><span class="help-highlight">進場局數</span>: 設定第幾局才開始下注(預設1=立即下注)</li>
+                    <li><span class="help-highlight">換房條件</span>:
+                        <ul>
+                            <li>AI正確率低於設定值 (預設50%)</li>
+                            <li>或最多連錯達到設定次數 (預設5次)</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="help-example">
+                    🏠 <strong>建議</strong>: 進場設定20,觀察20局後再決定是否下注
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-coins"></i> 資金管理</h3>
+                <ul>
+                    <li><span class="help-highlight">下注金額</span>: 設定各層級的下注金額(支援多層纜)</li>
+                    <li><span class="help-highlight">手動下注模式</span>: 勾選後啟用手動下注功能
+                        <ul>
+                            <li><strong>自動模式</strong>(未勾選): 進場後每局自動根據AI建議計算資金</li>
+                            <li><strong>手動模式</strong>(勾選): 點擊AI建議框選擇是否下注,再點擊開牌結果</li>
+                        </ul>
+                    </li>
+                    <li><span class="help-highlight">本金/餘額</span>: 記錄初始本金和當前餘額</li>
+                    <li><span class="help-highlight">止盈</span>: 獲利達到金額時顯示🎉提醒</li>
+                    <li><span class="help-highlight">止損</span>: 虧損達到金額時顯示🛑提醒</li>
+                    <li><span class="help-highlight">層數提醒</span>: 左側顯示當前所在層數和金額</li>
+                </ul>
+                <div class="help-example">
+                    💰 <strong>說明</strong>: 贏了回到第1層,輸了進入下一層。莊贏扣除5%抽水<br>
+                    🎯 <strong>手動模式使用</strong>: 
+                    <ol style="margin-top: 5px; padding-left: 20px;">
+                        <li>點擊AI建議框(出現金色外框=已選擇)</li>
+                        <li>再點一次=取消選擇</li>
+                        <li>開牌後點擊實際結果(莊或閒按鈕)</li>
+                        <li>有選擇=自動計算輸贏,沒選擇=只記錄不扣錢</li>
+                    </ol>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-chart-bar"></i> AI統計顯示</h3>
+                <ul>
+                    <li><span class="help-highlight">連中/連錯</span>: 當前AI預測的連續正確/錯誤次數</li>
+                    <li><span class="help-highlight">正確率</span>: AI整體預測準確度</li>
+                    <li><span class="help-highlight">跳連比率</span>: 跳/連的比例,用於判斷路單特性</li>
+                    <li><span class="help-highlight">策略狀態</span>: 顯示當前方案、模式和連敗進度</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-bell"></i> 提醒圖示說明</h3>
+                <ul>
+                    <li>📊 <span class="help-highlight">第X層(金額)</span>: 左側中間 - 當前下注層級</li>
+                    <li>🎉 <span class="help-highlight">止盈達標</span>: 左側中間 - 覆蓋層數顯示</li>
+                    <li>🛑 <span class="help-highlight">止損達標</span>: 左側中間 - 覆蓋層數顯示</li>
+                    <li>⚠️ <span class="help-highlight">重注</span>: 右側中間 - 60%以上勝率路單≥3個</li>
+                    <li>🐉 <span class="help-highlight">長龍X次</span>: 右側中間 - 連續相同結果</li>
+                    <li>🎯 <span class="help-highlight">進場</span>: 中間上方 - 尚未達到進場局數</li>
+                    <li>🏠 <span class="help-highlight">換房</span>: 中間上方 - 達到換房條件建議離開</li>
+                </ul>
+            </div>
+            
+            <div class="help-section">
+                <h3><i class="fas fa-lightbulb"></i> 使用技巧</h3>
+                <ul>
+                    <li>📈 建議觀察至少12局再參考AI預測</li>
+                    <li>🎯 可設定進場20局,避開開局不穩定期</li>
+                    <li>💡 勝率模式設定60%可過濾雜訊</li>
+                    <li>🔄 策略功能適合配合纜法使用</li>
+                    <li>⚠️ 換房提醒出現時建議評估是否繼續</li>
+                    <li>💰 建議設定止盈止損,避免過度投注</li>
+                </ul>
+            </div>
+        </div>
+    </div>
 
     <!-- 曲線圖模態視窗 -->
     <div id="chartModal" class="chart-modal">
@@ -4441,6 +6436,78 @@
                 activationInput.addEventListener('keypress', function(e) {
                     if (e.key === 'Enter') {
                         activateApp();
+                    }
+                });
+            }
+            
+            // 策略功能 checkbox 事件監聽
+            const enableStrategyCheckbox = document.getElementById('enableStrategy');
+            if (enableStrategyCheckbox) {
+                enableStrategyCheckbox.addEventListener('change', function() {
+                    console.log(`========== 策略功能 Checkbox 變更 ==========`);
+                    console.log(`新狀態: ${this.checked ? '啟用' : '停用'}`);
+                    
+                    if (this.checked) {
+                        // 啟用策略時,檢查當前選擇的方案
+                        const isPlanA = document.getElementById('strategyPlanA')?.checked;
+                        const isPlanB = document.getElementById('strategyPlanB')?.checked;
+                        
+                        if (isPlanA) {
+                            strategyMode = 'follow'; // A方案先跟隨
+                        } else if (isPlanB) {
+                            strategyMode = 'reverse'; // B方案先單跳
+                        }
+                        
+                        console.log(`初始模式設為: ${strategyMode} (A方案=${isPlanA}, B方案=${isPlanB})`);
+                        strategyErrorCount = 0;
+                    } else {
+                        // 停用策略時重置狀態
+                        strategyMode = 'follow';
+                        strategyErrorCount = 0;
+                        console.log('策略功能已停用,重置所有狀態');
+                    }
+                    
+                    console.log(`========== Checkbox 變更完成 ==========`);
+                    
+                    // 重新分析以更新顯示
+                    analyzeAll();
+                });
+            }
+            
+            // 策略方案 radio 事件監聽
+            const strategyPlanA = document.getElementById('strategyPlanA');
+            const strategyPlanB = document.getElementById('strategyPlanB');
+            
+            if (strategyPlanA) {
+                strategyPlanA.addEventListener('change', function() {
+                    if (this.checked) {
+                        console.log('========== 切換到 A 方案 (先跟隨) ==========');
+                        strategyMode = 'follow';
+                        strategyErrorCount = 0;
+                        console.log('已重置策略模式為: follow, 連敗計數: 0');
+                        
+                        // 如果策略功能已啟用,重新分析
+                        const enableStrategy = document.getElementById('enableStrategy')?.checked;
+                        if (enableStrategy) {
+                            analyzeAll();
+                        }
+                    }
+                });
+            }
+            
+            if (strategyPlanB) {
+                strategyPlanB.addEventListener('change', function() {
+                    if (this.checked) {
+                        console.log('========== 切換到 B 方案 (先單跳) ==========');
+                        strategyMode = 'reverse';
+                        strategyErrorCount = 0;
+                        console.log('已重置策略模式為: reverse, 連敗計數: 0');
+                        
+                        // 如果策略功能已啟用,重新分析
+                        const enableStrategy = document.getElementById('enableStrategy')?.checked;
+                        if (enableStrategy) {
+                            analyzeAll();
+                        }
                     }
                 });
             }
